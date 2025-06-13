@@ -1,3 +1,4 @@
+//front-end/src/contexts/AuthContext.jsx
 import {createContext, useState, useContext, useEffect} from 'react';
 import authService from '../services/authService';
 import toast from 'react-hot-toast';

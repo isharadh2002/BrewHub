@@ -1,3 +1,4 @@
+//front-end/src/common/Home.jsx
 import {useAuth} from '../contexts/AuthContext';
 
 const Home = () => {
