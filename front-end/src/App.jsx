@@ -11,8 +11,8 @@ import Register from './components/auth/Register';
 import OAuthSuccess from './components/auth/OAuthSuccess';
 
 // Public Pages
-import HomePage from './pages/public/HomePage';
-import MenuPage from './pages/public/MenuPage.jsx';
+import HomePage from './pages/public/HomePage.jsx';
+import MenuPage from './pages/public/MenuPage';
 /*import AboutPage from './pages/public/AboutPage';
 import LocationsPage from './pages/public/LocationsPage';
 import ContactPage from './pages/public/ContactPage';*/
@@ -35,6 +35,8 @@ import MenuManagement from './pages/admin/MenuManagement';
 import StaffManagement from './pages/admin/StaffManagement';
 import Analytics from './pages/admin/Analytics';
 import PromotionsPage from './pages/admin/PromotionsPage';*/
+
+import PageNotFound from "./pages/PageNotFound.jsx";
 
 // Role-based Route Protection Component
 const RoleRoute = ({children, allowedRoles}) => {
@@ -196,7 +198,7 @@ function App() {
                     </Route>
 
                     {/* Catch all - redirect to home */}
-                    <Route path="*" element={<Navigate to="/"/>}/>
+                    <Route path="*" element={<PageNotFound/>}/>
                 </Routes>
 
                 <Toaster
