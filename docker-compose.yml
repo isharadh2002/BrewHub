@@ -1,0 +1,63 @@
+
+
+services:
+  # Backend service
+  backend:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile
+    container_name: brewhub-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      # MongoDB Atlas connection string
+      MONGODB_URI: ${MONGODB_URI}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRE: ${JWT_EXPIRE}
+      CLIENT_URL: http://localhost:5173
+      # OAuth credentials
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      FACEBOOK_APP_ID: ${FACEBOOK_APP_ID}
+      FACEBOOK_APP_SECRET: ${FACEBOOK_APP_SECRET}
+      # Email configuration
+      EMAIL_HOST: smtp.gmail.com
+      EMAIL_PORT: 587
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASS: ${EMAIL_PASS}
+      # Payment
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      # Cloudinary
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+    networks:
+      - brewhub-network
+    volumes:
+      - ./back-end/uploads:/app/uploads
+
+  # Frontend service
+  frontend:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:3001/api
+        VITE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+        VITE_FACEBOOK_APP_ID: ${FACEBOOK_APP_ID}
+        VITE_STRIPE_PUBLIC_KEY: ${STRIPE_PUBLIC_KEY}
+    container_name: brewhub-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - brewhub-network
+
+networks:
+  brewhub-network:
+    driver: bridge
