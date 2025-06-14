@@ -1,7 +1,7 @@
 // front-end/src/App.jsx
 import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
 import {Toaster} from 'react-hot-toast';
-import {AuthProvider} from './contexts/AuthContext';
+import {AuthProvider, useAuth} from './contexts/AuthContext';
 import Layout from './components/common/Layout';
 import PrivateRoute from './components/common/PrivateRoute';
 
@@ -30,8 +30,8 @@ import InventoryPage from './pages/staff/InventoryPage';
 import CustomerQueue from './pages/staff/CustomerQueue';*/
 
 // Admin Pages
-/*import AdminDashboard from './pages/admin/AdminDashboard';
-import MenuManagement from './pages/admin/MenuManagement';
+import AdminDashboard from './pages/admin/AdminDashboard';
+/*import MenuManagement from './pages/admin/MenuManagement';
 import StaffManagement from './pages/admin/StaffManagement';
 import Analytics from './pages/admin/Analytics';
 import PromotionsPage from './pages/admin/PromotionsPage';*/
@@ -145,7 +145,7 @@ function App() {
                         />*/}
 
                         {/* Admin routes */}
-                        {/*<Route
+                        <Route
                             path="/admin/dashboard"
                             element={
                                 <PrivateRoute>
@@ -155,7 +155,7 @@ function App() {
                                 </PrivateRoute>
                             }
                         />
-                        <Route
+                        {/* <Route
                             path="/admin/menu"
                             element={
                                 <PrivateRoute>
