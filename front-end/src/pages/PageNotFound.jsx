@@ -1,7 +1,10 @@
 import React from 'react';
 import {Home, ArrowLeft, Search} from 'lucide-react';
+import {useNavigate} from "react-router-dom";
 
 export default function PageNotFound() {
+    const navigate = useNavigate();
+
     return (
         <div
             className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -34,7 +37,7 @@ export default function PageNotFound() {
                     {/* Action Buttons */}
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
                         <button
-                            onClick={() => window.history.back()}
+                            onClick={() => navigate(-1)}
                             className="group flex items-center space-x-2 px-6 py-3 bg-white border-2 border-brown-600 text-brown-600 rounded-lg font-semibold hover:bg-brown-600 hover:text-white transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
                         >
                             <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1"/>
@@ -42,7 +45,7 @@ export default function PageNotFound() {
                         </button>
 
                         <button
-                            onClick={() => window.location.href = '/'}
+                            onClick={() => navigate('/')}
                             className="group flex items-center space-x-2 px-6 py-3 bg-brown-600 text-white rounded-lg font-semibold hover:bg-brown-700 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
                         >
                             <Home className="w-5 h-5 transition-transform group-hover:scale-110"/>

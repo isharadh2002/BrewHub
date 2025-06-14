@@ -1,17 +1,35 @@
 // front-end/src/components/common/Header.jsx
-import {useState} from 'react';
+import {useState, useRef, useEffect} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {useAuth} from '../../contexts/AuthContext';
+import {User, ShoppingCart, Gift, Package, LogOut, Settings, ChevronDown} from 'lucide-react';
 
 const Header = () => {
     const {user, logout} = useAuth();
     const navigate = useNavigate();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
 
     const handleLogout = () => {
         logout();
         navigate('/');
+        setIsProfileDropdownOpen(false);
     };
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsProfileDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const publicLinks = [
         {name: 'Home', path: '/'},
@@ -21,25 +39,22 @@ const Header = () => {
         {name: 'Contact', path: '/contact'}
     ];
 
-    const userLinks = {
-        customer: [
-            {name: 'Profile', path: '/profile'},
-            {name: 'Orders', path: '/orders'},
-            {name: 'Cart', path: '/cart'},
-            {name: 'Rewards', path: '/loyalty'}
-        ],
+    const profileMenuItems = [
+        {name: 'Profile', path: '/profile', icon: User},
+        {name: 'Orders', path: '/orders', icon: Package},
+        {name: 'Cart', path: '/cart', icon: ShoppingCart},
+        {name: 'Rewards', path: '/loyalty', icon: Gift}
+    ];
+
+    const roleBasedLinks = {
         staff: [
-            {name: 'Dashboard', path: '/staff/dashboard'},
-            {name: 'Orders', path: '/staff/orders'},
-            {name: 'Inventory', path: '/staff/inventory'},
-            {name: 'Queue', path: '/staff/queue'}
+            {name: 'Staff Dashboard', path: '/staff/dashboard'}
+        ],
+        manager: [
+            {name: 'Staff Dashboard', path: '/staff/dashboard'}
         ],
         admin: [
-            {name: 'Dashboard', path: '/admin/dashboard'},
-            {name: 'Menu', path: '/admin/menu'},
-            {name: 'Staff', path: '/admin/staff'},
-            {name: 'Analytics', path: '/admin/analytics'},
-            {name: 'Promotions', path: '/admin/promotions'}
+            {name: 'Admin Dashboard', path: '/admin/dashboard'}
         ]
     };
 
@@ -69,11 +84,11 @@ const Header = () => {
                             </Link>
                         ))}
 
-                        {/* User-specific Links */}
-                        {user && userLinks[user.role] && (
+                        {/* Role-based Quick Links */}
+                        {user && roleBasedLinks[user.role] && (
                             <>
                                 <div className="h-6 w-px bg-gray-300"></div>
-                                {userLinks[user.role].map(link => (
+                                {roleBasedLinks[user.role].map(link => (
                                     <Link
                                         key={link.path}
                                         to={link.path}
@@ -85,19 +100,77 @@ const Header = () => {
                             </>
                         )}
 
-                        {/* Auth Buttons */}
+                        {/* Auth Section */}
                         <div className="flex items-center space-x-4">
                             {user ? (
-                                <div className="flex items-center space-x-4">
-                                    <span className="text-sm text-gray-600">
-                                        Hi, {user.name.split(' ')[0]}
-                                    </span>
+                                <div className="relative" ref={dropdownRef}>
                                     <button
-                                        onClick={handleLogout}
-                                        className="px-4 py-2 text-sm font-medium text-white bg-brown-600 rounded-md hover:bg-brown-700 transition-colors"
+                                        onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                                        className="flex items-center space-x-2 text-gray-700 hover:text-brown-600 transition-colors"
                                     >
-                                        Logout
+                                        {user.avatar ? (
+                                            <img
+                                                src={user.avatar}
+                                                alt={user.name}
+                                                className="w-8 h-8 rounded-full border-2 border-gray-200"
+                                            />
+                                        ) : (
+                                            <div
+                                                className="w-8 h-8 rounded-full bg-brown-600 flex items-center justify-center text-white font-semibold">
+                                                {user.name.charAt(0).toUpperCase()}
+                                            </div>
+                                        )}
+                                        <span className="hidden lg:block">{user.name.split(' ')[0]}</span>
+                                        <ChevronDown
+                                            className={`w-4 h-4 transition-transform ${isProfileDropdownOpen ? 'rotate-180' : ''}`}/>
                                     </button>
+
+                                    {/* Profile Dropdown Menu */}
+                                    {isProfileDropdownOpen && (
+                                        <div
+                                            className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
+                                            {/* User Info */}
+                                            <div className="px-4 py-3 border-b border-gray-200">
+                                                <p className="text-sm font-semibold text-gray-900">{user.name}</p>
+                                                <p className="text-xs text-gray-500">{user.email}</p>
+                                                <p className="text-xs text-brown-600 mt-1">{user.loyaltyPoints} points</p>
+                                            </div>
+
+                                            {/* Menu Items */}
+                                            {profileMenuItems.map((item) => (
+                                                <Link
+                                                    key={item.path}
+                                                    to={item.path}
+                                                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                                                    onClick={() => setIsProfileDropdownOpen(false)}
+                                                >
+                                                    <item.icon className="w-4 h-4 mr-3 text-gray-400"/>
+                                                    {item.name}
+                                                </Link>
+                                            ))}
+
+                                            {/* Settings - if needed in future */}
+                                            {/*<Link
+                                                to="/settings"
+                                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                                                onClick={() => setIsProfileDropdownOpen(false)}
+                                            >
+                                                <Settings className="w-4 h-4 mr-3 text-gray-400" />
+                                                Settings
+                                            </Link>*/}
+
+                                            {/* Logout */}
+                                            <div className="border-t border-gray-200 mt-1 pt-1">
+                                                <button
+                                                    onClick={handleLogout}
+                                                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                                                >
+                                                    <LogOut className="w-4 h-4 mr-3 text-gray-400"/>
+                                                    Logout
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <>
@@ -138,6 +211,30 @@ const Header = () => {
                 {/* Mobile Menu */}
                 {isMobileMenuOpen && (
                     <div className="md:hidden py-4 border-t border-gray-200">
+                        {/* User Info for Mobile */}
+                        {user && (
+                            <div className="px-4 py-3 mb-2 bg-gray-50 rounded-md">
+                                <div className="flex items-center space-x-3">
+                                    {user.avatar ? (
+                                        <img
+                                            src={user.avatar}
+                                            alt={user.name}
+                                            className="w-10 h-10 rounded-full"
+                                        />
+                                    ) : (
+                                        <div
+                                            className="w-10 h-10 rounded-full bg-brown-600 flex items-center justify-center text-white font-semibold">
+                                            {user.name.charAt(0).toUpperCase()}
+                                        </div>
+                                    )}
+                                    <div>
+                                        <p className="font-semibold">{user.name}</p>
+                                        <p className="text-sm text-gray-600">{user.loyaltyPoints} points</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {publicLinks.map(link => (
                             <Link
                                 key={link.path}
@@ -149,35 +246,46 @@ const Header = () => {
                             </Link>
                         ))}
 
-                        {user && userLinks[user.role] && (
+                        {user && (
                             <>
                                 <hr className="my-2"/>
-                                {userLinks[user.role].map(link => (
+                                {profileMenuItems.map(item => (
                                     <Link
-                                        key={link.path}
-                                        to={link.path}
+                                        key={item.path}
+                                        to={item.path}
                                         className="block py-2 text-gray-700 hover:text-brown-600"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
-                                        {link.name}
+                                        {item.name}
                                     </Link>
                                 ))}
+
+                                {roleBasedLinks[user.role] && (
+                                    <>
+                                        <hr className="my-2"/>
+                                        {roleBasedLinks[user.role].map(link => (
+                                            <Link
+                                                key={link.path}
+                                                to={link.path}
+                                                className="block py-2 text-gray-700 hover:text-brown-600"
+                                                onClick={() => setIsMobileMenuOpen(false)}
+                                            >
+                                                {link.name}
+                                            </Link>
+                                        ))}
+                                    </>
+                                )}
                             </>
                         )}
 
                         <hr className="my-2"/>
                         {user ? (
-                            <>
-                                <div className="py-2 text-sm text-gray-600">
-                                    Logged in as {user.name}
-                                </div>
-                                <button
-                                    onClick={handleLogout}
-                                    className="w-full text-left py-2 text-gray-700 hover:text-brown-600"
-                                >
-                                    Logout
-                                </button>
-                            </>
+                            <button
+                                onClick={handleLogout}
+                                className="w-full text-left py-2 text-gray-700 hover:text-brown-600"
+                            >
+                                Logout
+                            </button>
                         ) : (
                             <>
                                 <Link

@@ -13,9 +13,9 @@ import OAuthSuccess from './components/auth/OAuthSuccess';
 // Public Pages
 import HomePage from './pages/public/HomePage.jsx';
 import MenuPage from './pages/public/MenuPage';
-/*import AboutPage from './pages/public/AboutPage';
+import AboutPage from './pages/public/AboutPage';
 import LocationsPage from './pages/public/LocationsPage';
-import ContactPage from './pages/public/ContactPage';*/
+import ContactPage from './pages/public/ContactPage';
 
 // Customer Pages
 /*import ProfilePage from './pages/customer/ProfilePage';
@@ -64,9 +64,9 @@ function App() {
                         {/* Public routes */}
                         <Route path="/" element={<HomePage/>}/>
                         <Route path="/menu" element={<MenuPage/>}/>
-                        {/*<Route path="/about" element={<AboutPage/>}/>
+                        <Route path="/about" element={<AboutPage/>}/>
                         <Route path="/locations" element={<LocationsPage/>}/>
-                        <Route path="/contact" element={<ContactPage/>}/>*/}
+                        <Route path="/contact" element={<ContactPage/>}/>
 
                         {/* Customer routes (authenticated) */}
                         {/*<Route
