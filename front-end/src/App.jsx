@@ -30,8 +30,16 @@ import InventoryPage from './pages/staff/InventoryPage';
 import CustomerQueue from './pages/staff/CustomerQueue';*/
 
 // Admin Pages
-import AdminDashboard from './pages/admin/AdminDashboard';
-//import MenuManagement from './pages/admin/MenuManagement';
+import AdminLayout from './components/layout/AdminLayout';
+import AdminOverview from './pages/admin/AdminOverview';
+import {
+    MenuManagement,
+    Analytics,
+    StoreManagement,
+    OrderManagement,
+    PromotionsPage,
+    AdminSettings
+} from './pages/admin/MenuManagement';
 import StaffManagement from './pages/admin/StaffManagement';
 /*import Analytics from './pages/admin/Analytics';
 import PromotionsPage from './pages/admin/PromotionsPage';*/
@@ -144,57 +152,28 @@ function App() {
                             }
                         />*/}
 
-                        {/* Admin routes */}
+                        {/* Admin routes with nested structure */}
                         <Route
-                            path="/admin/dashboard"
+                            path="/admin"
                             element={
                                 <PrivateRoute>
                                     <RoleRoute allowedRoles={['admin']}>
-                                        <AdminDashboard/>
+                                        <AdminLayout/>
                                     </RoleRoute>
                                 </PrivateRoute>
                             }
-                        />
-                        {/* <Route
-                            path="/admin/menu"
-                            element={
-                                <PrivateRoute>
-                                    <RoleRoute allowedRoles={['admin', 'manager']}>
-                                        <MenuManagement/>
-                                    </RoleRoute>
-                                </PrivateRoute>
-                            }
-                        /> */}
-                        <Route
-                            path="/admin/staff"
-                            element={
-                                <PrivateRoute>
-                                    <RoleRoute allowedRoles={['admin']}>
-                                        <StaffManagement/>
-                                    </RoleRoute>
-                                </PrivateRoute>
-                            }
-                        />
-                        {/* <Route
-                            path="/admin/analytics"
-                            element={
-                                <PrivateRoute>
-                                    <RoleRoute allowedRoles={['admin', 'manager']}>
-                                        <Analytics/>
-                                    </RoleRoute>
-                                </PrivateRoute>
-                            }
-                        />
-                        <Route
-                            path="/admin/promotions"
-                            element={
-                                <PrivateRoute>
-                                    <RoleRoute allowedRoles={['admin', 'manager']}>
-                                        <PromotionsPage/>
-                                    </RoleRoute>
-                                </PrivateRoute>
-                            }
-                        /> */}
+                        >
+                            {/* Redirect /admin to /admin/dashboard */}
+                            <Route index element={<Navigate to="/admin/dashboard" replace/>}/>
+                            <Route path="dashboard" element={<AdminOverview/>}/>
+                            <Route path="menu" element={<MenuManagement/>}/>
+                            <Route path="orders" element={<OrderManagement/>}/>
+                            <Route path="staff" element={<StaffManagement/>}/>
+                            <Route path="analytics" element={<Analytics/>}/>
+                            <Route path="promotions" element={<PromotionsPage/>}/>
+                            <Route path="stores" element={<StoreManagement/>}/>
+                            <Route path="settings" element={<AdminSettings/>}/>
+                        </Route>
                     </Route>
 
                     {/* Catch all - redirect to home */}
