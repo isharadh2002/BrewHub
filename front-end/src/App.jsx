@@ -13,6 +13,7 @@ import OAuthSuccess from './components/auth/OAuthSuccess';
 // Public Pages
 import HomePage from './pages/public/HomePage.jsx';
 import MenuPage from './pages/public/MenuPage';
+import MenuItemDetails from './pages/public/MenuItemDetails';
 import AboutPage from './pages/public/AboutPage';
 import LocationsPage from './pages/public/LocationsPage';
 import ContactPage from './pages/public/ContactPage';
@@ -32,14 +33,15 @@ import CustomerQueue from './pages/staff/CustomerQueue';*/
 // Admin Pages
 import AdminLayout from './components/layout/AdminLayout';
 import AdminOverview from './pages/admin/AdminOverview';
+import MenuManagement from './pages/admin/MenuManagement';
 import {
-    MenuManagement,
     Analytics,
     StoreManagement,
     OrderManagement,
     PromotionsPage,
     AdminSettings
-} from './pages/admin/MenuManagement';
+} from './pages/admin/DummyComponents';
+import MenuForm from './pages/admin/MenuForm';
 import StaffManagement from './pages/admin/StaffManagement';
 /*import Analytics from './pages/admin/Analytics';
 import PromotionsPage from './pages/admin/PromotionsPage';*/
@@ -75,6 +77,7 @@ function App() {
                         <Route path="/about" element={<AboutPage/>}/>
                         <Route path="/locations" element={<LocationsPage/>}/>
                         <Route path="/contact" element={<ContactPage/>}/>
+                        <Route path="/menu/:id" element={<MenuItemDetails/>}/>
 
                         {/* Customer routes (authenticated) */}
                         {/*<Route
@@ -167,6 +170,8 @@ function App() {
                             <Route index element={<Navigate to="/admin/dashboard" replace/>}/>
                             <Route path="dashboard" element={<AdminOverview/>}/>
                             <Route path="menu" element={<MenuManagement/>}/>
+                            <Route path="menu/new" element={<MenuForm/>}/>
+                            <Route path="menu/edit/:id" element={<MenuForm/>}/>
                             <Route path="orders" element={<OrderManagement/>}/>
                             <Route path="staff" element={<StaffManagement/>}/>
                             <Route path="analytics" element={<Analytics/>}/>

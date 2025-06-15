@@ -39,6 +39,7 @@ require('./config/passport');
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
+app.use('/api/menu', require('./routes/menu'));
 
 // Test route
 app.get('/', (req, res) => {

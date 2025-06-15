@@ -1,190 +1,118 @@
 // front-end/src/pages/public/MenuPage.jsx
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {useAuth} from '../../contexts/AuthContext';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
+import menuService from '../../services/menuService';
+import toast from 'react-hot-toast';
+import {ShoppingCart, Edit2, Trash2, ToggleLeft, ToggleRight} from 'lucide-react';
 
 const MenuPage = () => {
     const {user} = useAuth();
+    const navigate = useNavigate();
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
+    const [menuItems, setMenuItems] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-    const categories = [
+    const defaultCategories = [
         {id: 'all', name: 'All Items', icon: '🍽️'},
         {id: 'coffee', name: 'Coffee', icon: '☕'},
         {id: 'tea', name: 'Tea', icon: '🍵'},
         {id: 'pastries', name: 'Pastries', icon: '🥐'},
         {id: 'sandwiches', name: 'Sandwiches', icon: '🥪'},
-        {id: 'desserts', name: 'Desserts', icon: '🍰'}
+        {id: 'desserts', name: 'Desserts', icon: '🍰'},
+        {id: 'beverages', name: 'Beverages', icon: '🥤'}
     ];
 
-    const menuItems = [
-        // Coffee
-        {
-            id: 1,
-            name: 'Espresso',
-            category: 'coffee',
-            price: 3.50,
-            description: 'Rich and bold single shot',
-            image: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?ixlib=rb-4.0.3',
-            popular: true
-        },
-        {
-            id: 2,
-            name: 'Cappuccino',
-            category: 'coffee',
-            price: 4.50,
-            description: 'Espresso with steamed milk foam',
-            image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?ixlib=rb-4.0.3'
-        },
-        {
-            id: 3,
-            name: 'Latte',
-            category: 'coffee',
-            price: 5.00,
-            description: 'Smooth espresso with steamed milk',
-            image: 'https://images.unsplash.com/photo-1561882468-9110e03e0f78?ixlib=rb-4.0.3',
-            popular: true
-        },
-        {
-            id: 4,
-            name: 'Americano',
-            category: 'coffee',
-            price: 3.75,
-            description: 'Espresso with hot water',
-            image: 'https://images.unsplash.com/photo-1532004491497-ba35c367d634?ixlib=rb-4.0.3'
-        },
-        {
-            id: 5,
-            name: 'Mocha',
-            category: 'coffee',
-            price: 5.50,
-            description: 'Chocolate espresso with steamed milk',
-            image: 'https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?ixlib=rb-4.0.3'
-        },
+    useEffect(() => {
+        fetchMenuItems();
+        fetchCategories();
+    }, [selectedCategory, searchTerm]);
 
-        // Tea
-        {
-            id: 6,
-            name: 'Earl Grey',
-            category: 'tea',
-            price: 3.00,
-            description: 'Classic black tea with bergamot',
-            image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?ixlib=rb-4.0.3'
-        },
-        {
-            id: 7,
-            name: 'Green Tea',
-            category: 'tea',
-            price: 3.00,
-            description: 'Fresh and light Japanese green tea',
-            image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?ixlib=rb-4.0.3'
-        },
-        {
-            id: 8,
-            name: 'Chai Latte',
-            category: 'tea',
-            price: 4.50,
-            description: 'Spiced tea with steamed milk',
-            image: 'https://images.unsplash.com/photo-1563639619-b4fa7c6c8c8a?ixlib=rb-4.0.3',
-            popular: true
-        },
+    const fetchMenuItems = async () => {
+        setLoading(true);
+        try {
+            const params = {};
+            if (selectedCategory !== 'all') {
+                params.category = selectedCategory;
+            }
+            if (searchTerm) {
+                params.search = searchTerm;
+            }
 
-        // Pastries
-        {
-            id: 9,
-            name: 'Croissant',
-            category: 'pastries',
-            price: 3.50,
-            description: 'Buttery French pastry',
-            image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?ixlib=rb-4.0.3'
-        },
-        {
-            id: 10,
-            name: 'Blueberry Muffin',
-            category: 'pastries',
-            price: 3.75,
-            description: 'Fresh blueberries in soft muffin',
-            image: 'https://images.unsplash.com/photo-1607958996333-41aef7caefaa?ixlib=rb-4.0.3'
-        },
-        {
-            id: 11,
-            name: 'Chocolate Chip Cookie',
-            category: 'pastries',
-            price: 2.50,
-            description: 'Warm cookie with chocolate chips',
-            image: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-4.0.3'
-        },
-
-        // Sandwiches
-        {
-            id: 12,
-            name: 'Avocado Toast',
-            category: 'sandwiches',
-            price: 8.50,
-            description: 'Fresh avocado on artisan bread',
-            image: 'https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?ixlib=rb-4.0.3',
-            popular: true
-        },
-        {
-            id: 13,
-            name: 'Club Sandwich',
-            category: 'sandwiches',
-            price: 9.50,
-            description: 'Triple-decker with turkey and bacon',
-            image: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?ixlib=rb-4.0.3'
-        },
-        {
-            id: 14,
-            name: 'Grilled Cheese',
-            category: 'sandwiches',
-            price: 7.00,
-            description: 'Classic melted cheese sandwich',
-            image: 'https://images.unsplash.com/photo-1528736235302-52922df5c122?ixlib=rb-4.0.3'
-        },
-
-        // Desserts
-        {
-            id: 15,
-            name: 'Chocolate Cake',
-            category: 'desserts',
-            price: 6.50,
-            description: 'Rich chocolate layer cake',
-            image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.0.3'
-        },
-        {
-            id: 16,
-            name: 'Cheesecake',
-            category: 'desserts',
-            price: 7.00,
-            description: 'New York style cheesecake',
-            image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?ixlib=rb-4.0.3'
-        },
-        {
-            id: 17,
-            name: 'Tiramisu',
-            category: 'desserts',
-            price: 7.50,
-            description: 'Italian coffee-flavored dessert',
-            image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?ixlib=rb-4.0.3'
+            const response = await menuService.getAllItems(params);
+            setMenuItems(response.data);
+        } catch (error) {
+            toast.error('Failed to load menu items');
+            console.error(error);
+        } finally {
+            setLoading(false);
         }
-    ];
+    };
 
-    const filteredItems = menuItems.filter(item => {
-        const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
-        const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.description.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesCategory && matchesSearch;
-    });
+    const fetchCategories = async () => {
+        try {
+            const response = await menuService.getCategories();
+            const categoriesWithIcons = response.data.map(cat => {
+                const defaultCat = defaultCategories.find(dc => dc.id === cat.category);
+                return {
+                    ...cat,
+                    id: cat.category,
+                    name: defaultCat?.name || cat.category,
+                    icon: defaultCat?.icon || '🍽️'
+                };
+            });
+            setCategories(categoriesWithIcons);
+        } catch (error) {
+            console.error('Failed to load categories:', error);
+        }
+    };
 
     const handleAddToCart = (item) => {
         if (!user) {
-            // Redirect to login if not authenticated
-            window.location.href = '/login';
+            navigate('/login');
             return;
         }
         // Add to cart logic here
         console.log('Adding to cart:', item);
+        toast.success(`${item.name} added to cart!`);
     };
+
+    const handleToggleAvailability = async (itemId, currentStatus) => {
+        try {
+            await menuService.toggleAvailability(itemId);
+            toast.success(`Item ${currentStatus ? 'disabled' : 'enabled'} successfully`);
+            fetchMenuItems();
+        } catch (error) {
+            toast.error('Failed to update item availability');
+            console.error(error);
+        }
+    };
+
+    const handleDeleteItem = async (itemId) => {
+        try {
+            await menuService.deleteItem(itemId);
+            toast.success('Item deleted successfully');
+            setDeleteConfirm(null);
+            fetchMenuItems();
+            fetchCategories();
+        } catch (error) {
+            toast.error('Failed to delete item');
+            console.error(error);
+        }
+    };
+
+    const isStaffOrAdmin = user && ['staff', 'manager', 'admin'].includes(user.role);
+    const isAdmin = user && user.role === 'admin';
+
+    const filteredItems = menuItems.filter(item => {
+        if (!isStaffOrAdmin && !item.isAvailable) {
+            return false;
+        }
+        return true;
+    });
 
     return (
         <div className="min-h-screen bg-gray-50 py-8">
@@ -197,6 +125,18 @@ const MenuPage = () => {
                         Made fresh daily with the finest ingredients.
                     </p>
                 </div>
+
+                {/* Admin Add Button */}
+                {isAdmin && (
+                    <div className="flex justify-end mb-6">
+                        <Link
+                            to="/admin/menu/new"
+                            className="px-6 py-3 bg-brown-600 text-white rounded-md hover:bg-brown-700 transition-colors"
+                        >
+                            Add New Item
+                        </Link>
+                    </div>
+                )}
 
                 {/* Search Bar */}
                 <div className="max-w-md mx-auto mb-8">
@@ -218,6 +158,17 @@ const MenuPage = () => {
 
                 {/* Category Filters */}
                 <div className="flex flex-wrap justify-center gap-4 mb-8">
+                    <button
+                        onClick={() => setSelectedCategory('all')}
+                        className={`px-6 py-3 rounded-full font-medium transition-colors ${
+                            selectedCategory === 'all'
+                                ? 'bg-brown-600 text-white'
+                                : 'bg-white text-gray-700 hover:bg-gray-100'
+                        }`}
+                    >
+                        <span className="mr-2">🍽️</span>
+                        All Items
+                    </button>
                     {categories.map(category => (
                         <button
                             key={category.id}
@@ -229,50 +180,164 @@ const MenuPage = () => {
                             }`}
                         >
                             <span className="mr-2">{category.icon}</span>
-                            {category.name}
+                            {category.name} ({category.availableCount}/{category.count})
                         </button>
                     ))}
                 </div>
 
-                {/* Menu Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                    {filteredItems.map(item => (
-                        <div key={item.id}
-                             className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                            {item.popular && (
-                                <div
-                                    className="absolute top-4 right-4 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold z-10">
-                                    Popular
+                {/* Loading State */}
+                {loading ? (
+                    <div className="flex justify-center py-12">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brown-600"></div>
+                    </div>
+                ) : (
+                    <>
+                        {/* Menu Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                            {filteredItems.map(item => (
+                                <div key={item._id}
+                                     className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow relative ${
+                                         !item.isAvailable && isStaffOrAdmin ? 'opacity-60' : ''
+                                     }`}>
+                                    {/* Admin Controls */}
+                                    {isStaffOrAdmin && (
+                                        <div className="absolute top-2 right-2 z-10 flex gap-2">
+                                            <button
+                                                onClick={() => handleToggleAvailability(item._id, item.isAvailable)}
+                                                className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
+                                                title={item.isAvailable ? 'Disable item' : 'Enable item'}
+                                            >
+                                                {item.isAvailable ? (
+                                                    <ToggleRight className="w-4 h-4 text-green-600"/>
+                                                ) : (
+                                                    <ToggleLeft className="w-4 h-4 text-gray-400"/>
+                                                )}
+                                            </button>
+                                            {isAdmin && (
+                                                <>
+                                                    <Link
+                                                        to={`/admin/menu/edit/${item._id}`}
+                                                        className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
+                                                    >
+                                                        <Edit2 className="w-4 h-4 text-brown-600"/>
+                                                    </Link>
+                                                    <button
+                                                        onClick={() => setDeleteConfirm(item._id)}
+                                                        className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
+                                                    >
+                                                        <Trash2 className="w-4 h-4 text-red-600"/>
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Badges */}
+                                    <div className="absolute top-4 left-4 flex gap-2 z-10">
+                                        {item.isPopular && (
+                                            <span
+                                                className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                                                Popular
+                                            </span>
+                                        )}
+                                        {item.isSeasonal && (
+                                            <span
+                                                className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                                                Seasonal
+                                            </span>
+                                        )}
+                                        {!item.isAvailable && (
+                                            <span
+                                                className="bg-gray-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                                                Unavailable
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <Link to={`/menu/${item._id}`} className="block">
+                                        <div className="h-48 overflow-hidden">
+                                            <img
+                                                src={item.image}
+                                                alt={item.name}
+                                                className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                                            />
+                                        </div>
+                                    </Link>
+
+                                    <div className="p-6">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <Link to={`/menu/${item._id}`}>
+                                                <h3 className="text-xl font-semibold hover:text-brown-600 transition-colors">{item.name}</h3>
+                                            </Link>
+                                            <span
+                                                className="text-xl font-bold text-brown-600">${item.price.toFixed(2)}</span>
+                                        </div>
+                                        <p className="text-gray-600 mb-4">{item.description}</p>
+
+                                        {/* Allergen Icons */}
+                                        {item.allergens && item.allergens.length > 0 && (
+                                            <div className="flex flex-wrap gap-1 mb-3">
+                                                {item.allergens.map((allergen, index) => (
+                                                    <span
+                                                        key={index}
+                                                        className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded"
+                                                        title={allergen}
+                                                    >
+                                                        {allergen}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        <button
+                                            onClick={() => handleAddToCart(item)}
+                                            disabled={!item.isAvailable}
+                                            className={`w-full px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 ${
+                                                item.isAvailable
+                                                    ? 'bg-brown-600 text-white hover:bg-brown-700'
+                                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                            }`}
+                                        >
+                                            <ShoppingCart className="w-4 h-4"/>
+                                            {item.isAvailable ? (user ? 'Add to Cart' : 'Login to Order') : 'Unavailable'}
+                                        </button>
+                                    </div>
                                 </div>
-                            )}
-                            <div className="h-48 overflow-hidden">
-                                <img
-                                    src={item.image}
-                                    alt={item.name}
-                                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                                />
+                            ))}
+                        </div>
+
+                        {/* No Results */}
+                        {filteredItems.length === 0 && (
+                            <div className="text-center py-12">
+                                <p className="text-gray-500 text-lg">No items found matching your search.</p>
                             </div>
-                            <div className="p-6">
-                                <div className="flex justify-between items-start mb-2">
-                                    <h3 className="text-xl font-semibold">{item.name}</h3>
-                                    <span className="text-xl font-bold text-brown-600">${item.price.toFixed(2)}</span>
-                                </div>
-                                <p className="text-gray-600 mb-4">{item.description}</p>
+                        )}
+                    </>
+                )}
+
+                {/* Delete Confirmation Modal */}
+                {deleteConfirm && (
+                    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
+                        <div className="bg-white rounded-lg max-w-md w-full p-6">
+                            <h3 className="text-lg font-medium text-gray-900 mb-4">Delete Menu Item</h3>
+                            <p className="text-sm text-gray-500 mb-4">
+                                Are you sure you want to delete this menu item? This action cannot be undone.
+                            </p>
+                            <div className="flex justify-end space-x-3">
                                 <button
-                                    onClick={() => handleAddToCart(item)}
-                                    className="w-full px-4 py-2 bg-brown-600 text-white rounded-md hover:bg-brown-700 transition-colors"
+                                    onClick={() => setDeleteConfirm(null)}
+                                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                                 >
-                                    {user ? 'Add to Cart' : 'Login to Order'}
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => handleDeleteItem(deleteConfirm)}
+                                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                                >
+                                    Delete
                                 </button>
                             </div>
                         </div>
-                    ))}
-                </div>
-
-                {/* No Results */}
-                {filteredItems.length === 0 && (
-                    <div className="text-center py-12">
-                        <p className="text-gray-500 text-lg">No items found matching your search.</p>
                     </div>
                 )}
 
