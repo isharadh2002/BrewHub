@@ -187,108 +187,111 @@ const StaffManagement = () => {
                         </div>
                     ) : (
                         <>
+                            {/* Scrollable Table with Fixed Header */}
                             <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-gray-50">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            User
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Email
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Role
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Joined
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Actions
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                    {users.map((user) => (
-                                        <tr key={user._id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center">
-                                                    {user.avatar ? (
-                                                        <img
-                                                            className="h-10 w-10 rounded-full"
-                                                            src={user.avatar}
-                                                            alt={user.name}
-                                                        />
-                                                    ) : (
-                                                        <div
-                                                            className="h-10 w-10 rounded-full bg-brown-600 flex items-center justify-center text-white font-semibold">
-                                                            {user.name.charAt(0).toUpperCase()}
-                                                        </div>
-                                                    )}
-                                                    <div className="ml-4">
-                                                        <div className="text-sm font-medium text-gray-900">
-                                                            {user.name}
-                                                        </div>
-                                                        <div className="text-sm text-gray-500">
-                                                            {user.loyaltyPoints} points
+                                <div className="max-h-96 overflow-y-auto">
+                                    <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="bg-gray-50 sticky top-0 z-10 shadow-sm">
+                                        <tr>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                                User
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                                Email
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                                Role
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                                Joined
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                                Actions
+                                            </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-200">
+                                        {users.map((user) => (
+                                            <tr key={user._id} className="hover:bg-gray-50">
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center">
+                                                        {user.avatar ? (
+                                                            <img
+                                                                className="h-10 w-10 rounded-full"
+                                                                src={user.avatar}
+                                                                alt={user.name}
+                                                            />
+                                                        ) : (
+                                                            <div
+                                                                className="h-10 w-10 rounded-full bg-brown-600 flex items-center justify-center text-white font-semibold">
+                                                                {user.name.charAt(0).toUpperCase()}
+                                                            </div>
+                                                        )}
+                                                        <div className="ml-4">
+                                                            <div className="text-sm font-medium text-gray-900">
+                                                                {user.name}
+                                                            </div>
+                                                            <div className="text-sm text-gray-500">
+                                                                {user.loyaltyPoints} points
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{user.email}</div>
-                                                {user.emailVerified && (
-                                                    <span className="text-xs text-green-600">Verified</span>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                {editingUser === user._id ? (
-                                                    <select
-                                                        value={user.role}
-                                                        onChange={(e) => handleRoleChange(user._id, e.target.value)}
-                                                        onBlur={() => setEditingUser(null)}
-                                                        className="text-sm rounded-md border-gray-300 focus:ring-brown-500 focus:border-brown-500"
-                                                        autoFocus
-                                                    >
-                                                        <option value="customer">Customer</option>
-                                                        <option value="staff">Staff</option>
-                                                        <option value="manager">Manager</option>
-                                                        <option value="admin">Admin</option>
-                                                    </select>
-                                                ) : (
-                                                    <span
-                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleColors[user.role]}`}>
-                                                            {user.role}
-                                                        </span>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {new Date(user.createdAt).toLocaleDateString()}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <div className="flex space-x-2">
-                                                    <button
-                                                        onClick={() => setEditingUser(user._id)}
-                                                        disabled={user._id === currentUser?._id}
-                                                        className="text-brown-600 hover:text-brown-900 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                        title={user._id === currentUser?._id ? "You can't edit your own role" : "Edit role"}
-                                                    >
-                                                        <Edit2 className="w-4 h-4"/>
-                                                    </button>
-                                                    <button
-                                                        onClick={() => setDeleteConfirm(user._id)}
-                                                        disabled={user._id === currentUser?._id}
-                                                        className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                        title={user._id === currentUser?._id ? "You can't delete yourself" : "Delete user"}
-                                                    >
-                                                        <Trash2 className="w-4 h-4"/>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    </tbody>
-                                </table>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900">{user.email}</div>
+                                                    {user.emailVerified && (
+                                                        <span className="text-xs text-green-600">Verified</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    {editingUser === user._id ? (
+                                                        <select
+                                                            value={user.role}
+                                                            onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                                                            onBlur={() => setEditingUser(null)}
+                                                            className="text-sm rounded-md border-gray-300 focus:ring-brown-500 focus:border-brown-500"
+                                                            autoFocus
+                                                        >
+                                                            <option value="customer">Customer</option>
+                                                            <option value="staff">Staff</option>
+                                                            <option value="manager">Manager</option>
+                                                            <option value="admin">Admin</option>
+                                                        </select>
+                                                    ) : (
+                                                        <span
+                                                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleColors[user.role]}`}>
+                                                                {user.role}
+                                                            </span>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {new Date(user.createdAt).toLocaleDateString()}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <div className="flex space-x-2">
+                                                        <button
+                                                            onClick={() => setEditingUser(user._id)}
+                                                            disabled={user._id === currentUser?._id}
+                                                            className="text-brown-600 hover:text-brown-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            title={user._id === currentUser?._id ? "You can't edit your own role" : "Edit role"}
+                                                        >
+                                                            <Edit2 className="w-4 h-4"/>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setDeleteConfirm(user._id)}
+                                                            disabled={user._id === currentUser?._id}
+                                                            className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            title={user._id === currentUser?._id ? "You can't delete yourself" : "Delete user"}
+                                                        >
+                                                            <Trash2 className="w-4 h-4"/>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
 
                             {/* Pagination */}
