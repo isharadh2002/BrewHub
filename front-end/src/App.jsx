@@ -31,9 +31,9 @@ import CustomerQueue from './pages/staff/CustomerQueue';*/
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
-/*import MenuManagement from './pages/admin/MenuManagement';
+//import MenuManagement from './pages/admin/MenuManagement';
 import StaffManagement from './pages/admin/StaffManagement';
-import Analytics from './pages/admin/Analytics';
+/*import Analytics from './pages/admin/Analytics';
 import PromotionsPage from './pages/admin/PromotionsPage';*/
 
 import PageNotFound from "./pages/PageNotFound.jsx";
@@ -164,7 +164,7 @@ function App() {
                                     </RoleRoute>
                                 </PrivateRoute>
                             }
-                        />
+                        /> */}
                         <Route
                             path="/admin/staff"
                             element={
@@ -175,7 +175,7 @@ function App() {
                                 </PrivateRoute>
                             }
                         />
-                        <Route
+                        {/* <Route
                             path="/admin/analytics"
                             element={
                                 <PrivateRoute>

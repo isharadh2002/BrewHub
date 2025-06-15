@@ -1,6 +1,7 @@
 // front-end/src/pages/admin/AdminDashboard.jsx
 import {useState} from 'react';
 import {useAuth} from '../../contexts/AuthContext';
+import StaffManagement from './StaffManagement';
 import {
     LayoutDashboard,
     Coffee,
@@ -222,16 +223,9 @@ const AdminDashboard = () => {
 
             case 'staff':
                 return (
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-lg font-semibold">Staff Management</h3>
-                            <button
-                                className="px-4 py-2 bg-brown-600 text-white rounded-md hover:bg-brown-700 transition-colors">
-                                Add Staff Member
-                            </button>
-                        </div>
-                        <p className="text-gray-600">Staff management functionality will be implemented here...</p>
-                    </div>
+
+                    <StaffManagement/>
+
                 );
 
             case 'analytics':
