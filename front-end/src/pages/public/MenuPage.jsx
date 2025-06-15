@@ -196,7 +196,7 @@ const MenuPage = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                             {filteredItems.map(item => (
                                 <div key={item._id}
-                                     className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow relative ${
+                                     className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow relative flex flex-col h-full ${
                                          !item.isAvailable && isStaffOrAdmin ? 'opacity-60' : ''
                                      }`}>
                                     {/* Admin Controls */}
@@ -264,7 +264,7 @@ const MenuPage = () => {
                                         </div>
                                     </Link>
 
-                                    <div className="p-6">
+                                    <div className="p-6 flex flex-col flex-grow">
                                         <div className="flex justify-between items-start mb-2">
                                             <Link to={`/menu/${item._id}`}>
                                                 <h3 className="text-xl font-semibold hover:text-brown-600 transition-colors">{item.name}</h3>
@@ -288,6 +288,9 @@ const MenuPage = () => {
                                                 ))}
                                             </div>
                                         )}
+
+                                        {/* Spacer to push button to bottom */}
+                                        <div className="flex-grow"></div>
 
                                         <button
                                             onClick={() => handleAddToCart(item)}
