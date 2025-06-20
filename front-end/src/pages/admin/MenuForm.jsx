@@ -59,7 +59,12 @@ const MenuForm = () => {
         name: 'tags'
     });
 
-    const {fields: customizationFields, append: appendCustomization, remove: removeCustomization} = useFieldArray({
+    const {
+        fields: customizationFields,
+        append: appendCustomization,
+        remove: removeCustomization,
+        update: updateCustomization
+    } = useFieldArray({
         control,
         name: 'customizations'
     });
@@ -86,13 +91,7 @@ const MenuForm = () => {
                 if (key === 'ingredients' || key === 'tags') {
                     setValue(key, item[key].map(value => ({value})));
                 } else if (key === 'customizations') {
-                    setValue(key, item[key].map(custom => ({
-                        ...custom,
-                        options: custom.options.map(opt => ({
-                            name: opt.name,
-                            priceModifier: opt.priceModifier || 0
-                        }))
-                    })));
+                    setValue(key, item[key]);
                 } else if (key === 'nutritionalInfo') {
                     setValue(key, item[key] || {});
                 } else if (key === 'allergens') {
@@ -124,10 +123,12 @@ const MenuForm = () => {
                     if (value) acc[key] = parseFloat(value);
                     return acc;
                 }, {}),
-                customizations: data.customizations.map(custom => ({
-                    ...custom,
-                    options: custom.options.filter(opt => opt.name)
-                })).filter(custom => custom.name && custom.options.length > 0)
+                customizations: data.customizations
+                    .filter(custom => custom.name && custom.options && custom.options.length > 0)
+                    .map(custom => ({
+                        ...custom,
+                        options: custom.options.filter(opt => opt.name)
+                    }))
             };
 
             if (isEdit) {
@@ -145,6 +146,18 @@ const MenuForm = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const addCustomizationOption = (customizationIndex) => {
+        const currentCustomization = customizationFields[customizationIndex];
+        const updatedOptions = [...(currentCustomization.options || []), {name: '', priceModifier: 0}];
+        updateCustomization(customizationIndex, {...currentCustomization, options: updatedOptions});
+    };
+
+    const removeCustomizationOption = (customizationIndex, optionIndex) => {
+        const currentCustomization = customizationFields[customizationIndex];
+        const updatedOptions = currentCustomization.options.filter((_, index) => index !== optionIndex);
+        updateCustomization(customizationIndex, {...currentCustomization, options: updatedOptions});
     };
 
     const allergenOptions = [
@@ -495,17 +508,18 @@ const MenuForm = () => {
                                                 className="w-32 px-3 py-2 border rounded-md focus:ring-2 focus:ring-brown-500"
                                                 placeholder="Price +/-"
                                             />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeCustomizationOption(index, optIndex)}
+                                                className="p-2 text-red-600 hover:text-red-700"
+                                            >
+                                                <X className="w-5 h-5"/>
+                                            </button>
                                         </div>
                                     ))}
                                     <button
                                         type="button"
-                                        onClick={() => {
-                                            const currentOptions = watch(`customizations.${index}.options`) || [];
-                                            setValue(`customizations.${index}.options`, [...currentOptions, {
-                                                name: '',
-                                                priceModifier: 0
-                                            }]);
-                                        }}
+                                        onClick={() => addCustomizationOption(index)}
                                         className="text-sm text-brown-600 hover:text-brown-700"
                                     >
                                         + Add Option
