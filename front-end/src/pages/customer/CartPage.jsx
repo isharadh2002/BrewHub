@@ -1,4 +1,4 @@
-// front-end/src/components/customer/CartPage.jsx
+// front-end/src/components/customer/Cart.jsx
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useCart} from '../../contexts/CartContext';
@@ -7,7 +7,7 @@ import orderService from '../../services/orderService';
 import toast from 'react-hot-toast';
 import {X, Plus, Minus, ShoppingBag, Trash2} from 'lucide-react';
 
-const CartPage = () => {
+const Cart = () => {
     const navigate = useNavigate();
     const {user} = useAuth();
     const {items, updateQuantity, removeFromCart, clearCart, calculateTotals, isOpen, setIsOpen} = useCart();
@@ -100,7 +100,7 @@ const CartPage = () => {
                         </button>
                     </div>
 
-                    {/* CartPage Items */}
+                    {/* Cart Items */}
                     <div className="flex-1 overflow-y-auto p-4">
                         {items.length === 0 ? (
                             <div className="text-center py-12">
@@ -351,4 +351,4 @@ const CartPage = () => {
     );
 };
 
-export default CartPage;
+export default Cart;
