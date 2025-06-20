@@ -302,7 +302,7 @@ const MenuPage = () => {
                                             }`}
                                         >
                                             <ShoppingCart className="w-4 h-4"/>
-                                            {item.isAvailable ? (user ? 'Add to Cart' : 'Login to Order') : 'Unavailable'}
+                                            {item.isAvailable ? (user ? 'Add to CartPage' : 'Login to Order') : 'Unavailable'}
                                         </button>
                                     </div>
                                 </div>

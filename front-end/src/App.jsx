@@ -19,10 +19,10 @@ import LocationsPage from './pages/public/LocationsPage';
 import ContactPage from './pages/public/ContactPage';
 
 // Customer Pages
-/*import ProfilePage from './pages/customer/ProfilePage';
+/*import ProfilePage from './pages/customer/ProfilePage';*/
 import OrdersPage from './pages/customer/OrdersPage';
 import CartPage from './pages/customer/CartPage';
-import LoyaltyPage from './pages/customer/LoyaltyPage';*/
+/*import LoyaltyPage from './pages/customer/LoyaltyPage';*/
 
 // Staff Pages
 /*import StaffDashboard from './pages/staff/StaffDashboard';
@@ -37,12 +37,12 @@ import MenuManagement from './pages/admin/MenuManagement';
 import {
     Analytics,
     StoreManagement,
-    OrderManagement,
     PromotionsPage,
     AdminSettings
 } from './pages/admin/DummyComponents';
 import MenuForm from './pages/admin/MenuForm';
 import StaffManagement from './pages/admin/StaffManagement';
+import OrderManagement from './pages/admin/OrderManagement';
 /*import Analytics from './pages/admin/Analytics';
 import PromotionsPage from './pages/admin/PromotionsPage';*/
 
@@ -80,14 +80,14 @@ function App() {
                         <Route path="/menu/:id" element={<MenuItemDetails/>}/>
 
                         {/* Customer routes (authenticated) */}
-                        {/*<Route
+                        {/* <Route
                             path="/profile"
                             element={
                                 <PrivateRoute>
                                     <ProfilePage/>
                                 </PrivateRoute>
                             }
-                        />
+                        /> */}
                         <Route
                             path="/orders"
                             element={
@@ -104,7 +104,7 @@ function App() {
                                 </PrivateRoute>
                             }
                         />
-                        <Route
+                        {/* <Route
                             path="/loyalty"
                             element={
                                 <PrivateRoute>

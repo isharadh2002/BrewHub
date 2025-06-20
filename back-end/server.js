@@ -40,6 +40,7 @@ require('./config/passport');
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/menu', require('./routes/menu'));
+app.use('/api/orders', require('./routes/orders'));
 
 // Test route
 app.get('/', (req, res) => {

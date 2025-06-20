@@ -262,7 +262,7 @@ const MenuPage = () => {
                                     onClick={() => handleAddToCart(item)}
                                     className="w-full px-4 py-2 bg-brown-600 text-white rounded-md hover:bg-brown-700 transition-colors"
                                 >
-                                    {user ? 'Add to Cart' : 'Login to Order'}
+                                    {user ? 'Add to CartPage' : 'Login to Order'}
                                 </button>
                             </div>
                         </div>
