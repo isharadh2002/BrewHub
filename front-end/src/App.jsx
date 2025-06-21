@@ -2,6 +2,7 @@
 import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
 import {Toaster} from 'react-hot-toast';
 import {AuthProvider, useAuth} from './contexts/AuthContext';
+import {CartProvider} from './contexts/CartContext';
 import Layout from './components/common/Layout';
 import PrivateRoute from './components/common/PrivateRoute';
 
@@ -63,24 +64,25 @@ function App() {
     return (
         <Router>
             <AuthProvider>
-                <Routes>
-                    {/* Auth routes - no layout */}
-                    <Route path="/login" element={<Login/>}/>
-                    <Route path="/register" element={<Register/>}/>
-                    <Route path="/auth/success" element={<OAuthSuccess/>}/>
+                <CartProvider>
+                    <Routes>
+                        {/* Auth routes - no layout */}
+                        <Route path="/login" element={<Login/>}/>
+                        <Route path="/register" element={<Register/>}/>
+                        <Route path="/auth/success" element={<OAuthSuccess/>}/>
 
-                    {/* Routes with layout */}
-                    <Route element={<Layout/>}>
-                        {/* Public routes */}
-                        <Route path="/" element={<HomePage/>}/>
-                        <Route path="/menu" element={<MenuPage/>}/>
-                        <Route path="/about" element={<AboutPage/>}/>
-                        <Route path="/locations" element={<LocationsPage/>}/>
-                        <Route path="/contact" element={<ContactPage/>}/>
-                        <Route path="/menu/:id" element={<MenuItemDetails/>}/>
+                        {/* Routes with layout */}
+                        <Route element={<Layout/>}>
+                            {/* Public routes */}
+                            <Route path="/" element={<HomePage/>}/>
+                            <Route path="/menu" element={<MenuPage/>}/>
+                            <Route path="/about" element={<AboutPage/>}/>
+                            <Route path="/locations" element={<LocationsPage/>}/>
+                            <Route path="/contact" element={<ContactPage/>}/>
+                            <Route path="/menu/:id" element={<MenuItemDetails/>}/>
 
-                        {/* Customer routes (authenticated) */}
-                        {/* <Route
+                            {/* Customer routes (authenticated) */}
+                            {/* <Route
                             path="/profile"
                             element={
                                 <PrivateRoute>
@@ -88,23 +90,23 @@ function App() {
                                 </PrivateRoute>
                             }
                         /> */}
-                        <Route
-                            path="/orders"
-                            element={
-                                <PrivateRoute>
-                                    <OrdersPage/>
-                                </PrivateRoute>
-                            }
-                        />
-                        <Route
-                            path="/cart"
-                            element={
-                                <PrivateRoute>
-                                    <CartPage/>
-                                </PrivateRoute>
-                            }
-                        />
-                        {/* <Route
+                            <Route
+                                path="/orders"
+                                element={
+                                    <PrivateRoute>
+                                        <OrdersPage/>
+                                    </PrivateRoute>
+                                }
+                            />
+                            <Route
+                                path="/cart"
+                                element={
+                                    <PrivateRoute>
+                                        <CartPage/>
+                                    </PrivateRoute>
+                                }
+                            />
+                            {/* <Route
                             path="/loyalty"
                             element={
                                 <PrivateRoute>
@@ -113,8 +115,8 @@ function App() {
                             }
                         /> */}
 
-                        {/* Staff routes */}
-                        {/*<Route
+                            {/* Staff routes */}
+                            {/*<Route
                             path="/staff/dashboard"
                             element={
                                 <PrivateRoute>
@@ -155,56 +157,57 @@ function App() {
                             }
                         />*/}
 
-                        {/* Admin routes with nested structure */}
-                        <Route
-                            path="/admin"
-                            element={
-                                <PrivateRoute>
-                                    <RoleRoute allowedRoles={['admin']}>
-                                        <AdminLayout/>
-                                    </RoleRoute>
-                                </PrivateRoute>
-                            }
-                        >
-                            {/* Redirect /admin to /admin/dashboard */}
-                            <Route index element={<Navigate to="/admin/dashboard" replace/>}/>
-                            <Route path="dashboard" element={<AdminOverview/>}/>
-                            <Route path="menu" element={<MenuManagement/>}/>
-                            <Route path="menu/new" element={<MenuForm/>}/>
-                            <Route path="menu/edit/:id" element={<MenuForm/>}/>
-                            <Route path="orders" element={<OrderManagement/>}/>
-                            <Route path="staff" element={<StaffManagement/>}/>
-                            <Route path="analytics" element={<Analytics/>}/>
-                            <Route path="promotions" element={<PromotionsPage/>}/>
-                            <Route path="stores" element={<StoreManagement/>}/>
-                            <Route path="settings" element={<AdminSettings/>}/>
+                            {/* Admin routes with nested structure */}
+                            <Route
+                                path="/admin"
+                                element={
+                                    <PrivateRoute>
+                                        <RoleRoute allowedRoles={['admin']}>
+                                            <AdminLayout/>
+                                        </RoleRoute>
+                                    </PrivateRoute>
+                                }
+                            >
+                                {/* Redirect /admin to /admin/dashboard */}
+                                <Route index element={<Navigate to="/admin/dashboard" replace/>}/>
+                                <Route path="dashboard" element={<AdminOverview/>}/>
+                                <Route path="menu" element={<MenuManagement/>}/>
+                                <Route path="menu/new" element={<MenuForm/>}/>
+                                <Route path="menu/edit/:id" element={<MenuForm/>}/>
+                                <Route path="orders" element={<OrderManagement/>}/>
+                                <Route path="staff" element={<StaffManagement/>}/>
+                                <Route path="analytics" element={<Analytics/>}/>
+                                <Route path="promotions" element={<PromotionsPage/>}/>
+                                <Route path="stores" element={<StoreManagement/>}/>
+                                <Route path="settings" element={<AdminSettings/>}/>
+                            </Route>
                         </Route>
-                    </Route>
 
-                    {/* Catch all - redirect to home */}
-                    <Route path="*" element={<PageNotFound/>}/>
-                </Routes>
+                        {/* Catch all - redirect to home */}
+                        <Route path="*" element={<PageNotFound/>}/>
+                    </Routes>
 
-                <Toaster
-                    position="top-right"
-                    toastOptions={{
-                        duration: 4000,
-                        style: {
-                            background: '#363636',
-                            color: '#fff',
-                        },
-                        success: {
+                    <Toaster
+                        position="top-right"
+                        toastOptions={{
+                            duration: 4000,
                             style: {
-                                background: '#4ade80',
+                                background: '#363636',
+                                color: '#fff',
                             },
-                        },
-                        error: {
-                            style: {
-                                background: '#ef4444',
+                            success: {
+                                style: {
+                                    background: '#4ade80',
+                                },
                             },
-                        },
-                    }}
-                />
+                            error: {
+                                style: {
+                                    background: '#ef4444',
+                                },
+                            },
+                        }}
+                    />
+                </CartProvider>
             </AuthProvider>
         </Router>
     );
