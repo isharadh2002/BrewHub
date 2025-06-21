@@ -23,6 +23,7 @@ import ContactPage from './pages/public/ContactPage';
 /*import ProfilePage from './pages/customer/ProfilePage';*/
 import OrdersPage from './pages/customer/OrdersPage';
 import CartPage from './pages/customer/CartPage';
+import OrderDetails from './pages/customer/OrderDetails';
 /*import LoyaltyPage from './pages/customer/LoyaltyPage';*/
 
 // Staff Pages
@@ -95,6 +96,14 @@ function App() {
                                 element={
                                     <PrivateRoute>
                                         <OrdersPage/>
+                                    </PrivateRoute>
+                                }
+                            />
+                            <Route
+                                path="/orders/:id"
+                                element={
+                                    <PrivateRoute>
+                                        <OrderDetails/>
                                     </PrivateRoute>
                                 }
                             />
