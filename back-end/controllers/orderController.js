@@ -674,7 +674,7 @@ exports.getMyOrders = async (req, res) => {
         // Get order stats for the customer
         const stats = await Order.aggregate([
             {
-                $match: { customer: mongoose.Types.ObjectId(req.user.id) }
+                $match: { customer: new mongoose.Types.ObjectId(req.user.id) }
             },
             {
                 $group: {
