@@ -4,6 +4,7 @@ import {useState, useEffect} from 'react';
 
 const HomePage = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [imagesLoaded, setImagesLoaded] = useState({});
 
     const heroSlides = [
         {
@@ -28,6 +29,17 @@ const HomePage = () => {
             setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
         }, 5000);
         return () => clearInterval(timer);
+    }, []);
+
+    // Preload images
+    useEffect(() => {
+        heroSlides.forEach((slide, index) => {
+            const img = new Image();
+            img.onload = () => {
+                setImagesLoaded(prev => ({...prev, [index]: true}));
+            };
+            img.src = slide.image;
+        });
     }, []);
 
     const features = [
@@ -83,22 +95,30 @@ const HomePage = () => {
     return (
         <div className="min-h-screen">
             {/* Hero Section with Slider */}
-            <section className="relative h-[600px] overflow-hidden">
+            <section className="relative h-[600px] overflow-hidden bg-gray-800">
                 {heroSlides.map((slide, index) => (
                     <div
                         key={index}
                         className={`absolute inset-0 transition-opacity duration-1000 ${
                             index === currentSlide ? 'opacity-100' : 'opacity-0'
                         }`}
+                        style={{
+                            backgroundImage: `url("${slide.image}")`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center center',
+                            backgroundRepeat: 'no-repeat',
+                            width: '100%',
+                            height: '100%'
+                        }}
                     >
+                        {/* Overlay */}
                         <div
-                            className="absolute inset-0 bg-cover bg-center"
-                            style={{backgroundImage: `url(${slide.image})`}}
-                        >
-                            <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-                        </div>
-                        <div className="relative h-full flex items-center justify-center text-center text-white px-4">
-                            <div>
+                            className="absolute inset-0 bg-black"
+                            style={{backgroundColor: 'rgba(0, 0, 0, 0.5)'}}
+                        ></div>
+                        {/* Content */}
+                        <div className="absolute inset-0 flex items-center justify-center text-center text-white px-4">
+                            <div className="relative z-10">
                                 <h1 className="text-5xl md:text-6xl font-bold mb-4">{slide.title}</h1>
                                 <p className="text-xl md:text-2xl mb-8">{slide.subtitle}</p>
                                 <div className="space-x-4">
@@ -121,7 +141,8 @@ const HomePage = () => {
                 ))}
 
                 {/* Slider Indicators */}
-                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2"
+                     style={{zIndex: 30}}>
                     {heroSlides.map((_, index) => (
                         <button
                             key={index}
