@@ -16,9 +16,9 @@ export const CartProvider = ({children}) => {
     const [items, setItems] = useState([]);
     const [cartCount, setCartCount] = useState(0);
 
-    // Load cart from sessionStorage on mount
+    // Load cart from localStorage on mount
     useEffect(() => {
-        const savedCart = sessionStorage.getItem('brewhub_cart');
+        const savedCart = localStorage.getItem('brewhub_cart');
         if (savedCart) {
             try {
                 const parsedCart = JSON.parse(savedCart);
@@ -26,17 +26,17 @@ export const CartProvider = ({children}) => {
                 updateCartCount(parsedCart);
             } catch (error) {
                 console.error('Error loading cart:', error);
-                sessionStorage.removeItem('brewhub_cart');
+                localStorage.removeItem('brewhub_cart');
             }
         }
     }, []);
 
-    // Save cart to sessionStorage whenever it changes
+    // Save cart to localStorage whenever it changes
     useEffect(() => {
         if (items.length > 0) {
-            sessionStorage.setItem('brewhub_cart', JSON.stringify(items));
+            localStorage.setItem('brewhub_cart', JSON.stringify(items));
         } else {
-            sessionStorage.removeItem('brewhub_cart');
+            localStorage.removeItem('brewhub_cart');
         }
         updateCartCount(items);
     }, [items]);
@@ -111,7 +111,7 @@ export const CartProvider = ({children}) => {
     // Clear entire cart
     const clearCart = () => {
         setItems([]);
-        sessionStorage.removeItem('brewhub_cart');
+        localStorage.removeItem('brewhub_cart');
         setCartCount(0);
         toast.success('Cart cleared');
     };

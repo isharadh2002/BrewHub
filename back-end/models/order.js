@@ -155,12 +155,17 @@ orderSchema.statics.generateOrderNumber = async function() {
 
 // Calculate totals before saving
 orderSchema.pre('save', function(next) {
-    if (this.isModified('items') || this.isModified('tax') || this.isModified('deliveryFee') || this.isModified('discount')) {
-        // Calculate subtotal from items
+    // Always calculate subtotal from items
+    if (this.items && this.items.length > 0) {
         this.subtotal = this.items.reduce((sum, item) => sum + item.subtotal, 0);
+    }
 
-        // Calculate total
-        this.total = this.subtotal + this.tax + this.deliveryFee - this.discount - (this.loyaltyPointsRedeemed || 0);
+    // Always calculate total
+    if (this.subtotal !== undefined) {
+        this.total = this.subtotal + (this.tax || 0) + (this.deliveryFee || 0) - (this.discount || 0) - (this.loyaltyPointsRedeemed || 0);
+
+        // Ensure total is not negative
+        this.total = Math.max(0, this.total);
 
         // Calculate loyalty points earned (1 point per dollar spent)
         this.loyaltyPointsEarned = Math.floor(this.total);

@@ -121,6 +121,7 @@ exports.createOrder = async (req, res) => {
         const taxRate = 0.1; // 10% tax
         const tax = subtotal * taxRate;
         const deliveryFee = orderType === 'delivery' ? 5 : 0;
+        const discount = 0; // You can add discount logic here if needed
 
         // Validate loyalty points
         const user = await User.findById(req.user.id).session(session);
@@ -146,6 +147,10 @@ exports.createOrder = async (req, res) => {
             }
         }
 
+        // Calculate total
+        const total = subtotal + tax + deliveryFee - discount - pointsToRedeem;
+        const loyaltyPointsEarned = Math.floor(total);
+
         // Generate order number
         const orderNumber = await Order.generateOrderNumber();
 
@@ -161,7 +166,10 @@ exports.createOrder = async (req, res) => {
             subtotal,
             tax,
             deliveryFee,
+            discount,
+            total,
             loyaltyPointsRedeemed: pointsToRedeem,
+            loyaltyPointsEarned,
             estimatedTime: new Date(Date.now() + 30 * 60000), // 30 minutes from now
             paymentStatus: paymentMethod === 'cash' ? 'pending' : 'paid'
         };
