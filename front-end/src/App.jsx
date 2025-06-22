@@ -48,7 +48,8 @@ import OrderManagement from './pages/admin/OrderManagement';
 /*import Analytics from './pages/admin/Analytics';
 import PromotionsPage from './pages/admin/PromotionsPage';*/
 
-import PageNotFound from "./pages/PageNotFound.jsx";
+import PageNotFound from './pages/PageNotFound.jsx';
+import ScrollToTop from './components/ScrollToTop.jsx';
 
 // Role-based Route Protection Component
 const RoleRoute = ({children, allowedRoles}) => {
@@ -64,6 +65,7 @@ const RoleRoute = ({children, allowedRoles}) => {
 function App() {
     return (
         <Router>
+            <ScrollToTop/>
             <AuthProvider>
                 <CartProvider>
                     <Routes>

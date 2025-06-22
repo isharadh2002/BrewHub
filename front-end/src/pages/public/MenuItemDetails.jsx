@@ -2,6 +2,7 @@
 import {useState, useEffect} from 'react';
 import {useParams, useNavigate, Link} from 'react-router-dom';
 import {useAuth} from '../../contexts/AuthContext';
+import {useCart} from '../../contexts/CartContext';
 import menuService from '../../services/menuService';
 import toast from 'react-hot-toast';
 import {
@@ -11,19 +12,22 @@ import {
     Users,
     AlertCircle,
     Plus,
-    Minus
+    Minus,
+    Check
 } from 'lucide-react';
 
 const MenuItemDetails = () => {
     const {id} = useParams();
     const navigate = useNavigate();
     const {user} = useAuth();
+    const {addToCart, isInCart, getItemQuantity} = useCart();
 
     const [item, setItem] = useState(null);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [selectedCustomizations, setSelectedCustomizations] = useState({});
     const [totalPrice, setTotalPrice] = useState(0);
+    const [addingToCart, setAddingToCart] = useState(false);
 
     useEffect(() => {
         fetchItemDetails();
@@ -40,7 +44,7 @@ const MenuItemDetails = () => {
             const response = await menuService.getItem(id);
             setItem(response.data);
 
-            // Initialize customizations
+            // Initialize required customizations
             const initialCustomizations = {};
             response.data.customizations?.forEach(custom => {
                 if (custom.required && custom.options.length > 0) {
@@ -79,7 +83,7 @@ const MenuItemDetails = () => {
         }));
     };
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         if (!user) {
             navigate('/login');
             return;
@@ -100,16 +104,25 @@ const MenuItemDetails = () => {
             return;
         }
 
-        // Add to cart logic here
-        const cartItem = {
-            item: item,
-            quantity: quantity,
-            customizations: selectedCustomizations,
-            totalPrice: totalPrice
-        };
+        setAddingToCart(true);
 
-        console.log('Adding to cart:', cartItem);
-        toast.success(`${item.name} added to cart!`);
+        try {
+            // Format customizations for cart
+            const customizations = Object.entries(selectedCustomizations).map(([name, option]) => ({
+                name,
+                option
+            }));
+
+            addToCart(item, quantity, customizations);
+
+            // Show success animation
+            setTimeout(() => {
+                setAddingToCart(false);
+            }, 1000);
+        } catch (error) {
+            toast.error('Failed to add item to cart');
+            setAddingToCart(false);
+        }
     };
 
     if (loading) {
@@ -128,13 +141,15 @@ const MenuItemDetails = () => {
         );
     }
 
+    const itemInCartQuantity = getItemQuantity(item._id);
+
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="container mx-auto px-4">
                 {/* Back button */}
                 <button
                     onClick={() => navigate('/menu')}
-                    className="flex items-center gap-2 text-gray-600 hover:text-brown-600 mb-6"
+                    className="flex items-center gap-2 text-gray-600 hover:text-brown-600 mb-6 transition-colors"
                 >
                     <ArrowLeft className="w-5 h-5"/>
                     Back to Menu
@@ -150,7 +165,7 @@ const MenuItemDetails = () => {
                                 className="w-full h-full object-cover"
                             />
                             {/* Badges */}
-                            <div className="absolute top-4 left-4 flex gap-2">
+                            <div className="absolute top-4 left-4 flex flex-wrap gap-2">
                                 {item.isPopular && (
                                     <span
                                         className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -214,7 +229,7 @@ const MenuItemDetails = () => {
                                         {item.allergens.map((allergen, index) => (
                                             <span
                                                 key={index}
-                                                className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm"
+                                                className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm capitalize"
                                             >
                                                 {allergen}
                                             </span>
@@ -234,16 +249,16 @@ const MenuItemDetails = () => {
                             )}
 
                             {/* Nutritional Info */}
-                            {item.nutritionalInfo && Object.keys(item.nutritionalInfo).length > 0 && (
+                            {item.nutritionalInfo && Object.values(item.nutritionalInfo).some(v => v !== null) && (
                                 <div className="mb-6">
-                                    <h3 className="font-semibold mb-2">Nutritional Information</h3>
+                                    <h3 className="font-semibold mb-3">Nutritional Information</h3>
                                     <div className="grid grid-cols-3 gap-4 text-sm">
                                         {Object.entries(item.nutritionalInfo).map(([key, value]) => (
-                                            value !== null && (
-                                                <div key={key} className="text-center p-2 bg-gray-50 rounded">
+                                            value !== null && value !== undefined && (
+                                                <div key={key} className="text-center p-3 bg-gray-50 rounded-lg">
                                                     <p className="font-medium capitalize">{key}</p>
-                                                    <p className="text-gray-600">
-                                                        {value}{key === 'calories' ? '' : 'g'}
+                                                    <p className="text-gray-600 text-lg mt-1">
+                                                        {value}{key === 'calories' ? '' : key === 'sodium' ? 'mg' : 'g'}
                                                     </p>
                                                 </div>
                                             )
@@ -267,13 +282,13 @@ const MenuItemDetails = () => {
                                                     <button
                                                         key={optIndex}
                                                         onClick={() => handleCustomizationChange(custom.name, option)}
-                                                        className={`p-2 rounded border transition-colors ${
+                                                        className={`p-3 rounded-lg border-2 transition-all ${
                                                             selectedCustomizations[custom.name]?.name === option.name
                                                                 ? 'border-brown-600 bg-brown-50 text-brown-600'
                                                                 : 'border-gray-300 hover:border-gray-400'
                                                         }`}
                                                     >
-                                                        <span>{option.name}</span>
+                                                        <span className="font-medium">{option.name}</span>
                                                         {option.priceModifier > 0 && (
                                                             <span className="text-sm text-gray-500 ml-1">
                                                                 (+${option.priceModifier.toFixed(2)})
@@ -287,16 +302,16 @@ const MenuItemDetails = () => {
                                 </div>
                             )}
 
-                            {/* Quantity and Add to CartPage */}
+                            {/* Quantity and Add to Cart */}
                             <div className="flex items-center gap-4">
-                                <div className="flex items-center border border-gray-300 rounded-md">
+                                <div className="flex items-center border border-gray-300 rounded-lg">
                                     <button
                                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
                                         className="p-3 hover:bg-gray-100 transition-colors"
                                     >
                                         <Minus className="w-4 h-4"/>
                                     </button>
-                                    <span className="px-4 py-2 font-medium">{quantity}</span>
+                                    <span className="px-6 py-2 font-medium">{quantity}</span>
                                     <button
                                         onClick={() => setQuantity(quantity + 1)}
                                         className="p-3 hover:bg-gray-100 transition-colors"
@@ -307,21 +322,42 @@ const MenuItemDetails = () => {
 
                                 <button
                                     onClick={handleAddToCart}
-                                    disabled={!item.isAvailable}
-                                    className={`flex-1 px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center gap-2 ${
+                                    disabled={!item.isAvailable || addingToCart}
+                                    className={`flex-1 px-6 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
                                         item.isAvailable
-                                            ? 'bg-brown-600 text-white hover:bg-brown-700'
+                                            ? addingToCart
+                                                ? 'bg-green-600 text-white'
+                                                : 'bg-brown-600 text-white hover:bg-brown-700'
                                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     }`}
                                 >
-                                    <ShoppingCart className="w-5 h-5"/>
-                                    {item.isAvailable ? (
-                                        <span>Add to Cart - ${totalPrice.toFixed(2)}</span>
+                                    {addingToCart ? (
+                                        <>
+                                            <Check className="w-5 h-5"/>
+                                            Added to Cart!
+                                        </>
                                     ) : (
-                                        <span>Currently Unavailable</span>
+                                        <>
+                                            <ShoppingCart className="w-5 h-5"/>
+                                            {item.isAvailable ? (
+                                                <span>Add to Cart - ${totalPrice.toFixed(2)}</span>
+                                            ) : (
+                                                <span>Currently Unavailable</span>
+                                            )}
+                                        </>
                                     )}
                                 </button>
                             </div>
+
+                            {/* Cart Info */}
+                            {itemInCartQuantity > 0 && !addingToCart && (
+                                <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                                    <p className="text-sm text-green-800">
+                                        You have {itemInCartQuantity} of this item in your cart.{' '}
+                                        <Link to="/cart" className="font-medium underline">View Cart</Link>
+                                    </p>
+                                </div>
+                            )}
 
                             {/* Tags */}
                             {item.tags && item.tags.length > 0 && (
@@ -340,6 +376,12 @@ const MenuItemDetails = () => {
                             )}
                         </div>
                     </div>
+                </div>
+
+                {/* Related Items Section (Optional) */}
+                <div className="mt-12">
+                    <h2 className="text-2xl font-bold mb-6">You Might Also Like</h2>
+                    {/* Implement related items component here */}
                 </div>
             </div>
         </div>

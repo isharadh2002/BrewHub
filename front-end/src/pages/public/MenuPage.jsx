@@ -1,13 +1,15 @@
 // front-end/src/pages/public/MenuPage.jsx
 import {useState, useEffect} from 'react';
 import {useAuth} from '../../contexts/AuthContext';
+import {useCart} from '../../contexts/CartContext';
 import {Link, useNavigate} from 'react-router-dom';
 import menuService from '../../services/menuService';
 import toast from 'react-hot-toast';
-import {ShoppingCart, Edit2, Trash2, ToggleLeft, ToggleRight} from 'lucide-react';
+import {ShoppingCart, Edit2, Trash2, ToggleLeft, ToggleRight, Check} from 'lucide-react';
 
 const MenuPage = () => {
     const {user} = useAuth();
+    const {addToCart, isInCart, getItemQuantity} = useCart();
     const navigate = useNavigate();
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
@@ -15,6 +17,7 @@ const MenuPage = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [addedItems, setAddedItems] = useState(new Set());
 
     const defaultCategories = [
         {id: 'all', name: 'All Items', icon: '🍽️'},
@@ -75,9 +78,31 @@ const MenuPage = () => {
             navigate('/login');
             return;
         }
-        // Add to cart logic here
-        console.log('Adding to cart:', item);
-        toast.success(`${item.name} added to cart!`);
+
+        if (!item.isAvailable) {
+            toast.error('This item is currently unavailable');
+            return;
+        }
+
+        // If item has required customizations, navigate to details page
+        const hasRequiredCustomizations = item.customizations?.some(c => c.required);
+        if (hasRequiredCustomizations) {
+            navigate(`/menu/${item._id}`);
+            return;
+        }
+
+        // Add to cart with default options
+        addToCart(item, 1, []);
+
+        // Show added animation
+        setAddedItems(prev => new Set(prev).add(item._id));
+        setTimeout(() => {
+            setAddedItems(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(item._id);
+                return newSet;
+            });
+        }, 2000);
     };
 
     const handleToggleAvailability = async (itemId, currentStatus) => {
@@ -163,7 +188,7 @@ const MenuPage = () => {
                         className={`px-6 py-3 rounded-full font-medium transition-colors ${
                             selectedCategory === 'all'
                                 ? 'bg-brown-600 text-white'
-                                : 'bg-white text-gray-700 hover:bg-gray-100'
+                                : 'bg-white text-gray-700 hover:bg-gray-100 shadow-sm'
                         }`}
                     >
                         <span className="mr-2">🍽️</span>
@@ -176,7 +201,7 @@ const MenuPage = () => {
                             className={`px-6 py-3 rounded-full font-medium transition-colors ${
                                 selectedCategory === category.id
                                     ? 'bg-brown-600 text-white'
-                                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                                    : 'bg-white text-gray-700 hover:bg-gray-100 shadow-sm'
                             }`}
                         >
                             <span className="mr-2">{category.icon}</span>
@@ -194,119 +219,146 @@ const MenuPage = () => {
                     <>
                         {/* Menu Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                            {filteredItems.map(item => (
-                                <div key={item._id}
-                                     className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow relative flex flex-col h-full ${
-                                         !item.isAvailable && isStaffOrAdmin ? 'opacity-60' : ''
-                                     }`}>
-                                    {/* Admin Controls */}
-                                    {isStaffOrAdmin && (
-                                        <div className="absolute top-2 right-2 z-10 flex gap-2">
-                                            <button
-                                                onClick={() => handleToggleAvailability(item._id, item.isAvailable)}
-                                                className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
-                                                title={item.isAvailable ? 'Disable item' : 'Enable item'}
-                                            >
-                                                {item.isAvailable ? (
-                                                    <ToggleRight className="w-4 h-4 text-green-600"/>
-                                                ) : (
-                                                    <ToggleLeft className="w-4 h-4 text-gray-400"/>
+                            {filteredItems.map(item => {
+                                const itemQuantity = getItemQuantity(item._id);
+                                const isAdded = addedItems.has(item._id);
+
+                                return (
+                                    <div key={item._id}
+                                         className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow relative flex flex-col h-full ${
+                                             !item.isAvailable && isStaffOrAdmin ? 'opacity-60' : ''
+                                         }`}>
+                                        {/* Admin Controls */}
+                                        {isStaffOrAdmin && (
+                                            <div className="absolute top-2 right-2 z-10 flex gap-2">
+                                                <button
+                                                    onClick={() => handleToggleAvailability(item._id, item.isAvailable)}
+                                                    className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
+                                                    title={item.isAvailable ? 'Disable item' : 'Enable item'}
+                                                >
+                                                    {item.isAvailable ? (
+                                                        <ToggleRight className="w-4 h-4 text-green-600"/>
+                                                    ) : (
+                                                        <ToggleLeft className="w-4 h-4 text-gray-400"/>
+                                                    )}
+                                                </button>
+                                                {isAdmin && (
+                                                    <>
+                                                        <Link
+                                                            to={`/admin/menu/edit/${item._id}`}
+                                                            className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
+                                                        >
+                                                            <Edit2 className="w-4 h-4 text-brown-600"/>
+                                                        </Link>
+                                                        <button
+                                                            onClick={() => setDeleteConfirm(item._id)}
+                                                            className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
+                                                        >
+                                                            <Trash2 className="w-4 h-4 text-red-600"/>
+                                                        </button>
+                                                    </>
                                                 )}
-                                            </button>
-                                            {isAdmin && (
-                                                <>
-                                                    <Link
-                                                        to={`/admin/menu/edit/${item._id}`}
-                                                        className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
-                                                    >
-                                                        <Edit2 className="w-4 h-4 text-brown-600"/>
-                                                    </Link>
-                                                    <button
-                                                        onClick={() => setDeleteConfirm(item._id)}
-                                                        className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
-                                                    >
-                                                        <Trash2 className="w-4 h-4 text-red-600"/>
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                    )}
-
-                                    {/* Badges */}
-                                    <div className="absolute top-4 left-4 flex gap-2 z-10">
-                                        {item.isPopular && (
-                                            <span
-                                                className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-                                                Popular
-                                            </span>
-                                        )}
-                                        {item.isSeasonal && (
-                                            <span
-                                                className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-                                                Seasonal
-                                            </span>
-                                        )}
-                                        {!item.isAvailable && (
-                                            <span
-                                                className="bg-gray-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-                                                Unavailable
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    <Link to={`/menu/${item._id}`} className="block">
-                                        <div className="h-48 overflow-hidden">
-                                            <img
-                                                src={item.image}
-                                                alt={item.name}
-                                                className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                                            />
-                                        </div>
-                                    </Link>
-
-                                    <div className="p-6 flex flex-col flex-grow">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <Link to={`/menu/${item._id}`}>
-                                                <h3 className="text-xl font-semibold hover:text-brown-600 transition-colors">{item.name}</h3>
-                                            </Link>
-                                            <span
-                                                className="text-xl font-bold text-brown-600">${item.price.toFixed(2)}</span>
-                                        </div>
-                                        <p className="text-gray-600 mb-4">{item.description}</p>
-
-                                        {/* Allergen Icons */}
-                                        {item.allergens && item.allergens.length > 0 && (
-                                            <div className="flex flex-wrap gap-1 mb-3">
-                                                {item.allergens.map((allergen, index) => (
-                                                    <span
-                                                        key={index}
-                                                        className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded"
-                                                        title={allergen}
-                                                    >
-                                                        {allergen}
-                                                    </span>
-                                                ))}
                                             </div>
                                         )}
 
-                                        {/* Spacer to push button to bottom */}
-                                        <div className="flex-grow"></div>
+                                        {/* Badges */}
+                                        <div className="absolute top-4 left-4 flex gap-2 z-10">
+                                            {item.isPopular && (
+                                                <span
+                                                    className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                                                    Popular
+                                                </span>
+                                            )}
+                                            {item.isSeasonal && (
+                                                <span
+                                                    className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                                                    Seasonal
+                                                </span>
+                                            )}
+                                            {!item.isAvailable && (
+                                                <span
+                                                    className="bg-gray-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                                                    Unavailable
+                                                </span>
+                                            )}
+                                        </div>
 
-                                        <button
-                                            onClick={() => handleAddToCart(item)}
-                                            disabled={!item.isAvailable}
-                                            className={`w-full px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 ${
-                                                item.isAvailable
-                                                    ? 'bg-brown-600 text-white hover:bg-brown-700'
-                                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                            }`}
-                                        >
-                                            <ShoppingCart className="w-4 h-4"/>
-                                            {item.isAvailable ? (user ? 'Add to CartPage' : 'Login to Order') : 'Unavailable'}
-                                        </button>
+                                        <Link to={`/menu/${item._id}`} className="block">
+                                            <div className="h-48 overflow-hidden">
+                                                <img
+                                                    src={item.image}
+                                                    alt={item.name}
+                                                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                                                />
+                                            </div>
+                                        </Link>
+
+                                        <div className="p-6 flex flex-col flex-grow">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <Link to={`/menu/${item._id}`}>
+                                                    <h3 className="text-xl font-semibold hover:text-brown-600 transition-colors">{item.name}</h3>
+                                                </Link>
+                                                <span
+                                                    className="text-xl font-bold text-brown-600">${item.price.toFixed(2)}</span>
+                                            </div>
+                                            <p className="text-gray-600 mb-4 flex-grow">{item.description}</p>
+
+                                            {/* Allergen Icons */}
+                                            {item.allergens && item.allergens.length > 0 && (
+                                                <div className="flex flex-wrap gap-1 mb-3">
+                                                    {item.allergens.map((allergen, index) => (
+                                                        <span
+                                                            key={index}
+                                                            className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded capitalize"
+                                                            title={allergen}
+                                                        >
+                                                            {allergen}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {/* Cart Status */}
+                                            {itemQuantity > 0 && (
+                                                <div className="mb-3 p-2 bg-green-50 rounded-md">
+                                                    <p className="text-sm text-green-700">
+                                                        {itemQuantity} in cart • <Link to="/cart"
+                                                                                       className="font-medium underline">View
+                                                        Cart</Link>
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {/* Add to Cart Button */}
+                                            <button
+                                                onClick={() => handleAddToCart(item)}
+                                                disabled={!item.isAvailable}
+                                                className={`w-full px-4 py-2 rounded-md transition-all flex items-center justify-center gap-2 ${
+                                                    item.isAvailable
+                                                        ? isAdded
+                                                            ? 'bg-green-600 text-white'
+                                                            : 'bg-brown-600 text-white hover:bg-brown-700'
+                                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                                }`}
+                                            >
+                                                {isAdded ? (
+                                                    <>
+                                                        <Check className="w-4 h-4"/>
+                                                        Added!
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <ShoppingCart className="w-4 h-4"/>
+                                                        {item.isAvailable ? (
+                                                            item.customizations?.some(c => c.required) ? 'Customize' : 'Add to Cart'
+                                                        ) : 'Unavailable'}
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
 
                         {/* No Results */}

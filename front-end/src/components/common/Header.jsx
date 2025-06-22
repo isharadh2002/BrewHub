@@ -2,10 +2,12 @@
 import {useState, useRef, useEffect} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {useAuth} from '../../contexts/AuthContext';
+import {useCart} from '../../contexts/CartContext';
 import {User, ShoppingCart, Gift, Package, LogOut, Settings, ChevronDown} from 'lucide-react';
 
 const Header = () => {
     const {user, logout} = useAuth();
+    const {cartCount} = useCart();
     const navigate = useNavigate();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -42,7 +44,6 @@ const Header = () => {
     const profileMenuItems = [
         {name: 'Profile', path: '/profile', icon: User},
         {name: 'Orders', path: '/orders', icon: Package},
-        {name: 'Cart', path: '/cart', icon: ShoppingCart},
         {name: 'Rewards', path: '/loyalty', icon: Gift}
     ];
 
@@ -102,6 +103,20 @@ const Header = () => {
 
                         {/* Auth Section */}
                         <div className="flex items-center space-x-4">
+                            {/* Cart Button */}
+                            <Link
+                                to="/cart"
+                                className="relative text-gray-700 hover:text-brown-600 transition-colors p-2"
+                            >
+                                <ShoppingCart className="w-6 h-6"/>
+                                {cartCount > 0 && (
+                                    <span
+                                        className="absolute -top-1 -right-1 bg-brown-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                                        {cartCount > 99 ? '99+' : cartCount}
+                                    </span>
+                                )}
+                            </Link>
+
                             {user ? (
                                 <div className="relative" ref={dropdownRef}>
                                     <button
@@ -149,16 +164,6 @@ const Header = () => {
                                                 </Link>
                                             ))}
 
-                                            {/* Settings - if needed in future */}
-                                            {/*<Link
-                                                to="/settings"
-                                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                                                onClick={() => setIsProfileDropdownOpen(false)}
-                                            >
-                                                <Settings className="w-4 h-4 mr-3 text-gray-400" />
-                                                Settings
-                                            </Link>*/}
-
                                             {/* Logout */}
                                             <div className="border-t border-gray-200 mt-1 pt-1">
                                                 <button
@@ -192,20 +197,36 @@ const Header = () => {
                     </div>
 
                     {/* Mobile Menu Button */}
-                    <button
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="md:hidden p-2 rounded-md text-gray-700 hover:text-brown-600 hover:bg-gray-100"
-                    >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            {isMobileMenuOpen ? (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                      d="M6 18L18 6M6 6l12 12"/>
-                            ) : (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                      d="M4 6h16M4 12h16M4 18h16"/>
+                    <div className="md:hidden flex items-center space-x-4">
+                        {/* Mobile Cart Button */}
+                        <Link
+                            to="/cart"
+                            className="relative text-gray-700 hover:text-brown-600 transition-colors p-2"
+                        >
+                            <ShoppingCart className="w-6 h-6"/>
+                            {cartCount > 0 && (
+                                <span
+                                    className="absolute -top-1 -right-1 bg-brown-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                                    {cartCount > 99 ? '99+' : cartCount}
+                                </span>
                             )}
-                        </svg>
-                    </button>
+                        </Link>
+
+                        <button
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            className="p-2 rounded-md text-gray-700 hover:text-brown-600 hover:bg-gray-100"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {isMobileMenuOpen ? (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                          d="M6 18L18 6M6 6l12 12"/>
+                                ) : (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                          d="M4 6h16M4 12h16M4 18h16"/>
+                                )}
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Mobile Menu */}
