@@ -39,7 +39,7 @@ const CartPage = () => {
     const totals = calculateTotals();
     const deliveryFee = orderType === 'delivery' ? 5 : 0;
     const finalTotal = totals.total + deliveryFee - loyaltyPointsToUse;
-    const loyaltyPointsEarned = Math.floor(finalTotal);
+    const loyaltyPointsEarned = Math.floor(finalTotal / 10); // 1 point for every $10 spent
 
     const handleCheckout = async () => {
         if (!user) {
@@ -425,7 +425,7 @@ const CartPage = () => {
                                                     className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-brown-500"
                                                 />
                                                 <p className="text-xs text-gray-500 mt-1">
-                                                    1 point = $1 discount
+                                                    1 point = $1 discount • Earn 1 point per $10 spent
                                                 </p>
                                             </div>
                                         </div>

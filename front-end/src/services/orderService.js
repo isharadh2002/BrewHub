@@ -72,7 +72,7 @@ const orderService = {
         const total = subtotal + tax + deliveryFee - loyaltyPointsRedeemed;
 
         // Calculate loyalty points earned
-        const loyaltyPointsEarned = Math.floor(total);
+        const loyaltyPointsEarned = Math.floor(total / 10); // 1 point for every $10 spent
 
         return {
             subtotal,
@@ -103,7 +103,7 @@ const orderService = {
             confirmed: 'bg-blue-100 text-blue-800',
             preparing: 'bg-orange-100 text-orange-800',
             ready: 'bg-green-100 text-green-800',
-            completed: 'bg-gray-100 text-gray-800',
+            completed: 'bg-green-100 text-green-800',
             cancelled: 'bg-red-100 text-red-800'
         };
         return colors[status] || 'bg-gray-100 text-gray-800';

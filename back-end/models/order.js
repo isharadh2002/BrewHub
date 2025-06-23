@@ -167,8 +167,8 @@ orderSchema.pre('save', function(next) {
         // Ensure total is not negative
         this.total = Math.max(0, this.total);
 
-        // Calculate loyalty points earned (1 point per dollar spent)
-        this.loyaltyPointsEarned = Math.floor(this.total);
+        // Calculate loyalty points earned (1 point for every $10 spent)
+        this.loyaltyPointsEarned = Math.floor(this.total/10);
     }
 
     // Set completed/cancelled timestamps

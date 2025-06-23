@@ -149,7 +149,7 @@ exports.createOrder = async (req, res) => {
 
         // Calculate total
         const total = subtotal + tax + deliveryFee - discount - pointsToRedeem;
-        const loyaltyPointsEarned = Math.floor(total);
+        const loyaltyPointsEarned = Math.floor(total/10); // 1 point for every $10 spent
 
         // Generate order number
         const orderNumber = await Order.generateOrderNumber();
