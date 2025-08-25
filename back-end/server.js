@@ -5,6 +5,9 @@ const session = require('express-session');
 const passport = require('passport');
 const connectDB = require('./config/database');
 require('dotenv').config();
+const fs = require('fs');
+const https = require('https');
+const path = require('path');
 
 const app = express();
 
@@ -13,7 +16,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: process.env.CLIENT_URL || 'https://localhost:5173',
     credentials: true
 }));
 app.use(express.json());
@@ -59,6 +62,20 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
-    console.log(`Server is running. Listening on http://localhost:${PORT}`);
+
+// SSL Certificate paths
+const sslOptions = {
+    key: fs.readFileSync(path.join(__dirname, '../certs/localhost.key')),
+    cert: fs.readFileSync(path.join(__dirname, '../certs/localhost.crt'))
+};
+
+// Create HTTPS server
+const httpsServer = https.createServer(sslOptions, app);
+
+httpsServer.listen(PORT, () => {
+    console.log(`🔒 HTTPS Server running on https://localhost:${PORT}`);
 });
+
+/*app.listen(PORT, () => {
+    console.log(`Server is running. Listening on http://localhost:${PORT}`);
+});*/

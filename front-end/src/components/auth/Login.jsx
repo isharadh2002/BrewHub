@@ -5,6 +5,7 @@ import {useForm} from 'react-hook-form';
 import {useAuth} from '../../contexts/AuthContext';
 
 const Login = () => {
+    const VITE_API_URL = import.meta.env.VITE_API_URL;
     const navigate = useNavigate();
     const {login} = useAuth();
     const [loading, setLoading] = useState(false);
@@ -26,7 +27,8 @@ const Login = () => {
     };
 
     const handleSocialLogin = (provider) => {
-        window.location.href = `http://localhost:3001/api/auth/${provider}`;
+        console.log(VITE_API_URL);
+        window.location.href = `${VITE_API_URL}/auth/${provider}`;
     };
 
     return (
