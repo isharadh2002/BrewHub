@@ -40,13 +40,15 @@ router.get('/google/callback',
     oauthSuccess
 );
 
-// Facebook OAuth routes
-router.get('/facebook',
-    passport.authenticate('facebook', { scope: ['email'] })
+// Auth0 OIDC routes (replaces Facebook)
+router.get('/auth0',
+    passport.authenticate('auth0', {
+        scope: 'openid profile email'
+    })
 );
 
-router.get('/facebook/callback',
-    passport.authenticate('facebook', { failureRedirect: '/login' }),
+router.get('/auth0/callback',
+    passport.authenticate('auth0', { failureRedirect: '/login' }),
     oauthSuccess
 );
 

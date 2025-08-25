@@ -1,7 +1,7 @@
 //back-end/config/passport.js
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const FacebookStrategy = require('passport-facebook').Strategy;
+const OidcStrategy = require('passport-openidconnect').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const User = require('../models/user');
@@ -71,29 +71,33 @@ passport.use(
     )
 );
 
-// Facebook OAuth Strategy
-passport.use(
-    new FacebookStrategy(
+// Auth0 OIDC Strategy (replaces Facebook)
+passport.use('auth0',
+    new OidcStrategy(
         {
-            clientID: process.env.FACEBOOK_APP_ID,
-            clientSecret: process.env.FACEBOOK_APP_SECRET,
-            callbackURL: '/api/auth/facebook/callback',
-            profileFields: ['id', 'emails', 'name', 'picture']
+            issuer: `https://${process.env.AUTH0_DOMAIN}`,
+            authorizationURL: `https://${process.env.AUTH0_DOMAIN}/authorize`,
+            tokenURL: `https://${process.env.AUTH0_DOMAIN}/oauth/token`,
+            userInfoURL: `https://${process.env.AUTH0_DOMAIN}/userinfo`,
+            clientID: process.env.AUTH0_CLIENT_ID,
+            clientSecret: process.env.AUTH0_CLIENT_SECRET,
+            callbackURL: '/api/auth/auth0/callback',
+            scope: 'openid profile email'
         },
-        async (accessToken, refreshToken, profile, done) => {
+        async (issuer, profile, done) => {
             try {
-                // Check if user exists
+                // Check if user exists by Auth0 sub (subject) or email
                 let user = await User.findOne({
                     $or: [
-                        { facebookId: profile.id },
+                        { auth0Id: profile.id },
                         { email: profile.emails[0].value }
                     ]
                 });
 
                 if (user) {
-                    // If user exists but doesn't have facebookId, add it
-                    if (!user.facebookId) {
-                        user.facebookId = profile.id;
+                    // If user exists but doesn't have auth0Id, add it
+                    if (!user.auth0Id) {
+                        user.auth0Id = profile.id;
                         await user.save();
                     }
                     return done(null, user);
@@ -101,10 +105,10 @@ passport.use(
 
                 // Create new user
                 user = await User.create({
-                    facebookId: profile.id,
-                    name: `${profile.name.givenName} ${profile.name.familyName}`,
+                    auth0Id: profile.id,
+                    name: profile.displayName || profile.name || 'Auth0 User',
                     email: profile.emails[0].value,
-                    avatar: profile.photos[0].value,
+                    avatar: profile.photos && profile.photos[0] ? profile.photos[0].value : null,
                     emailVerified: true
                 });
 
