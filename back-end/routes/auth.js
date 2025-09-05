@@ -32,7 +32,7 @@ router.get('/logout', logout);
 
 // Google OAuth routes
 router.get('/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] })
+    passport.authenticate('google', { scope: ['profile', 'email', 'openid'] })
 );
 
 router.get('/google/callback',
@@ -42,9 +42,7 @@ router.get('/google/callback',
 
 // Auth0 OIDC routes (replaces Facebook)
 router.get('/auth0',
-    passport.authenticate('auth0', {
-        scope: 'openid profile email'
-    })
+    passport.authenticate('auth0', {scope: 'openid profile email'})
 );
 
 router.get('/auth0/callback',
