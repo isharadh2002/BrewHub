@@ -62,20 +62,46 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3001;
 
+const useHTTPS =
+    process.env.NODE_ENV === 'development' &&
+    fs.existsSync(path.join(__dirname, '../certs/localhost.key')) &&
+    fs.existsSync(path.join(__dirname, '../certs/localhost.crt'));
 
-// SSL Certificate paths
-const sslOptions = {
-    key: fs.readFileSync(path.join(__dirname, '../certs/localhost.key')),
-    cert: fs.readFileSync(path.join(__dirname, '../certs/localhost.crt'))
-};
+console.log("Use HTTPS :" + useHTTPS);
 
-// Create HTTPS server
-const httpsServer = https.createServer(sslOptions, app);
 
-httpsServer.listen(PORT, () => {
-    console.log(`🔒 HTTPS Server running on https://localhost:${PORT}`);
-});
+function startServer() {
+    if (useHTTPS) {
+        try {
+            // SSL Certificate paths
+            const sslOptions = {
+                key: fs.readFileSync(path.join(__dirname, '../certs/localhost.key')),
+                cert: fs.readFileSync(path.join(__dirname, '../certs/localhost.crt'))
+            };
 
-/*app.listen(PORT, () => {
-    console.log(`Server is running. Listening on http://localhost:${PORT}`);
-});*/
+            // Create HTTPS server
+            const httpsServer = https.createServer(sslOptions, app);
+
+            httpsServer.listen(PORT, () => {
+                console.log(`🔒 HTTPS Server running on https://localhost:${PORT}`);
+            });
+        } catch (error) {
+            console.warn('⚠️  SSL certificates not found, falling back to HTTP');
+            console.warn('Error:', error.message);
+            startHTTPServer();
+        }
+    } else {
+        startHTTPServer();
+    }
+}
+
+function startHTTPServer() {
+    app.listen(PORT, () => {
+        console.log(`🌐 HTTP Server running on http://localhost:${PORT}`);
+        if (process.env.NODE_ENV === 'production') {
+            console.log('Production mode: Expecting reverse proxy (nginx/cloudflare) to handle HTTPS');
+        }
+    });
+}
+
+startServer();
