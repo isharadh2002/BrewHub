@@ -138,7 +138,7 @@ CLIENT_URL=https://localhost:5173
 # Database
 MONGODB_URI=mongodb://localhost:27017/brewhub
 # For MongoDB Atlas:
-# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/brewhub
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/brewhub
 
 # JWT Configuration
 JWT_SECRET=your_super_secret_jwt_key_minimum_32_characters_long
