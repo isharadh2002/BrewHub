@@ -91,8 +91,8 @@ brewhub/
 ### 1. Clone & Setup
 
 ```bash
-git clone <your-repository-url>
-cd brewhub
+git clone https://github.com/isharadh2002/BrewHub.git
+cd BrewHub
 ```
 
 ### 2. Generate SSL Certificates
