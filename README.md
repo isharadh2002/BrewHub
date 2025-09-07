@@ -145,11 +145,11 @@ JWT_SECRET=your_super_secret_jwt_key_minimum_32_characters_long
 JWT_EXPIRE=7d
 SESSION_SECRET=your_session_secret_key_here
 
-# OAuth Credentials
+# Google OAuth Credentials
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 
-# Auth0 Configuration (replaces Facebook)
+# Auth0 Credentials
 AUTH0_CLIENT_ID=your_auth0_client_id
 AUTH0_CLIENT_SECRET=your_auth0_client_secret
 AUTH0_DOMAIN=your_auth0_domain
