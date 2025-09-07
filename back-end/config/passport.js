@@ -33,7 +33,7 @@ passport.use(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: '/api/auth/google/callback'
+            callbackURL: process.env.GOOGLE_CALLBACK_URL || '/api/auth/google/callback'
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
@@ -78,7 +78,7 @@ passport.use(
             domain: process.env.AUTH0_DOMAIN,
             clientID: process.env.AUTH0_CLIENT_ID,
             clientSecret: process.env.AUTH0_CLIENT_SECRET,
-            callbackURL: '/api/auth/auth0/callback'
+            callbackURL: process.env.AUTH0_CALLBACK_URL || '/api/auth/auth0/callback'
         },
         async (accessToken, refreshToken, extraParams, profile, done) => {
             try {
