@@ -2,6 +2,14 @@
 
 A modern full-stack MERN application for a coffee shop with comprehensive features including menu browsing, online ordering, order tracking, loyalty program, staff order management, inventory tracking, admin dashboard for analytics and menu management, and secure authentication with email/password and OAuth (Google, Auth0).
 
+## 🌐 Live Demo
+🚀 Try it now:
+
+- Frontend: https://brew-hub.vercel.app
+- Backend API: https://brew-hub-api.vercel.app
+
+Experience the full coffee shop application with real-time ordering, authentication, and admin features!
+
 ## 🌟 Features
 
 **Authentication & Security**
