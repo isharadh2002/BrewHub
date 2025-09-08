@@ -1,5 +1,5 @@
 // front-end/src/pages/public/AboutPage.jsx
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const AboutPage = () => {
     const teamMembers = [
@@ -53,11 +53,11 @@ const AboutPage = () => {
     ];
 
     const milestones = [
-        {year: '2020', event: 'BrewHub was founded with our first location'},
-        {year: '2021', event: 'Expanded to 5 locations across the city'},
-        {year: '2022', event: 'Launched our mobile app and loyalty program'},
-        {year: '2023', event: 'Reached 10,000 loyal customers'},
-        {year: '2024', event: 'Opening 10 new locations nationwide'}
+        { year: '2020', event: 'BrewHub was founded with our first location' },
+        { year: '2021', event: 'Expanded to 5 locations across the city' },
+        { year: '2022', event: 'Launched our mobile app and loyalty program' },
+        { year: '2023', event: 'Reached 10,000 loyal customers' },
+        { year: '2024', event: 'Opening 10 new locations nationwide' }
     ];
 
     return (
@@ -66,9 +66,9 @@ const AboutPage = () => {
             <section className="relative h-[400px] overflow-hidden">
                 <div
                     className="absolute inset-0 bg-cover bg-center"
-                    style={{backgroundImage: 'url(https://images.unsplash.com/photo-1447933601403-0c6688de566e?ixlib=rb-4.0.3)'}}
+                    style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1447933601403-0c6688de566e?ixlib=rb-4.0.3)' }}
                 >
-                    <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+                    <div className="absolute inset-0 bg-black/40"></div>
                 </div>
                 <div className="relative h-full flex items-center justify-center text-center text-white px-4">
                     <div>
