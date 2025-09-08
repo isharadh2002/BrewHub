@@ -156,11 +156,13 @@ SESSION_SECRET=your_session_secret_key_here
 # Google OAuth Credentials
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_CALLBACK_URL=https://localhost:3001/api/auth/google/callback
 
 # Auth0 Credentials
 AUTH0_CLIENT_ID=your_auth0_client_id
 AUTH0_CLIENT_SECRET=your_auth0_client_secret
 AUTH0_DOMAIN=your_auth0_domain
+AUTH0_CALLBACK_URL=https://localhost:3001/api/auth/auth0/callback
 
 # File Upload (Cloudinary)
 CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
